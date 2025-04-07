@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Guillaume's Paris Restaurant Guide</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms"></script> <link rel="preconnect" href="https://fonts.googleapis.com">
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
@@ -12,6 +13,7 @@
     <style>
       @font-face {
         font-family: 'LucideIcons';
+        /* Updated CDN URL for better reliability */
         src: url('https://cdn.jsdelivr.net/npm/lucide-static@latest/font/Lucide.ttf') format('truetype');
       }
       .lucide {
@@ -181,6 +183,16 @@
             border: 1px solid #e5e7eb;
             margin-bottom: 2rem;
         }
+
+        /* Leaflet Icon Customization - Ensure popup is above icon */
+        .leaflet-popup-content-wrapper {
+            border-radius: 8px;
+        }
+        .leaflet-popup-content {
+            margin: 10px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
     </style>
     <script>
         // Tailwind Configuration (optional, if needed for specifics)
@@ -195,7 +207,9 @@
         }
     </script>
 </head>
-<body class="bg-gray-50 font-inter"> <div class="container mx-auto p-4 md:p-8"> <header class="text-center mb-10">
+<body class="bg-gray-50 font-inter">
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-10">
             <h1 class="text-4xl font-bold text-gray-800 mb-2">Guillaume's Paris Restaurant Guide</h1>
             <p class="text-lg text-gray-600">Your curated list of Parisian culinary delights</p>
         </header>
@@ -203,7 +217,7 @@
         <div id="search-filter" class="flex flex-col md:flex-row gap-4 mb-8 items-center">
             <div class="relative flex-grow w-full md:w-auto">
                  <span class="absolute inset-y-0 left-0 flex items-center pl-3">
-                    <i class="lucide text-gray-400">&#xea1c;</i> </span>
+                    <i class="lucide text-gray-400"></i> </span>
                  <input
                     type="text"
                     id="search-input"
@@ -300,6 +314,26 @@
         let map;
         let markers = []; // To keep track of markers for filtering
 
+        // --- Custom Leaflet Icons ---
+        const blueIcon = new L.Icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+
+        const redIcon = new L.Icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+
+
         // --- Map Initialization ---
         function initMap() {
             // Initialize the map centered on Paris
@@ -308,7 +342,7 @@
             // Add OpenStreetMap tile layer
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
 
              // Add initial markers for all restaurants
@@ -324,13 +358,17 @@
             // Add new markers
             restaurantsToDisplay.forEach(restaurant => {
                 if (restaurant.latitude && restaurant.longitude) {
-                    const marker = L.marker([restaurant.latitude, restaurant.longitude]).addTo(map);
+                    // *** Choose icon based on category ***
+                    const chosenIcon = restaurant.category === "Bars & Nightlife" ? redIcon : blueIcon;
+
+                    const marker = L.marker([restaurant.latitude, restaurant.longitude], { icon: chosenIcon }).addTo(map); // *** Use chosen icon ***
+
                     // Create popup content
                     const popupContent = `
                         <div class="font-sans">
                             <strong class="text-base block mb-1">${restaurant.name}</strong>
-                            <span class="text-sm text-gray-600 block mb-1">${restaurant.type} - ${restaurant.priceRange}</span>
-                            <span class="text-sm text-gray-500 block">${restaurant.address}</span>
+                            <span class="text-sm text-gray-600 block mb-1">${restaurant.type || 'N/A'} - ${restaurant.priceRange || 'N/A'}</span>
+                            <span class="text-sm text-gray-500 block">${restaurant.address || 'N/A'}</span>
                             ${generateGoogleMapsLink(restaurant.name, restaurant.address) ?
                                 `<a href="${generateGoogleMapsLink(restaurant.name, restaurant.address)}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 text-sm mt-1 inline-block">View on Google Maps</a>`
                                 : ''
@@ -347,7 +385,13 @@
                  const group = new L.featureGroup(markers);
                  // Check if map has bounds before fitting
                  try {
-                    map.fitBounds(group.getBounds().pad(0.1)); // Fit bounds with padding
+                    // Only fit bounds if it's not the initial full load, or if few markers exist
+                    // This prevents zooming out too far when all markers are shown initially.
+                    if (restaurantsToDisplay.length < restaurants.length || markers.length < 10) {
+                         map.fitBounds(group.getBounds().pad(0.1)); // Fit bounds with padding
+                    } else if (map.getZoom() < 12) { // Ensure initial zoom isn't too far out
+                        map.setView([48.8566, 2.3522], 12);
+                    }
                  } catch (e) {
                     console.warn("Could not fit map bounds, likely no valid markers.", e);
                     // Fallback: Set default view if fitBounds fails
@@ -448,7 +492,7 @@
                 </div>
                 <div> ${mapLink ? `
                         <a href="${mapLink}" target="_blank" rel="noopener noreferrer" class="map-link">
-                            <i class="lucide">&#xe9c3;</i> View on Map
+                            <i class="lucide"></i> View on Map
                         </a>
                     ` : ''}
                 </div>
@@ -461,16 +505,18 @@
         // Generate Google Maps search link
         function generateGoogleMapsLink(name, address) {
             if (!name || !address) return null;
+            // Use https for Google Maps links
             const query = encodeURIComponent(`${name}, ${address}`);
+            // Correct Google Maps search URL structure
             return `https://www.google.com/maps/search/?api=1&query=${query}`;
         }
 
          // Generate star icons based on rating
         function generateRatingStars(rating) {
-            if (typeof rating !== 'number' || rating < 0) return 'N/A';
-            const fullStar = '<i class="lucide">&#xea73;</i>'; // star icon filled
-            const halfStar = '<i class="lucide">&#xea72;</i>'; // star-half icon
-            const emptyStar = '<i class="lucide">&#xea74;</i>'; // star icon empty
+            if (typeof rating !== 'number' || rating < 0 || isNaN(rating)) return 'N/A'; // Added isNaN check
+            const fullStar = '<i class="lucide"></i>'; // star icon filled
+            const halfStar = '<i class="lucide"></i>'; // star-half icon
+            const emptyStar = '<i class="lucide"></i>'; // star icon empty
             const maxStars = 5;
             let starsHtml = '';
             const roundedRating = Math.round(rating * 2) / 2; // Round to nearest 0.5
@@ -495,8 +541,12 @@
                 // Remove 'www.' if present
                 return parsedUrl.hostname.replace(/^www\./, '');
             } catch (e) {
+                // If URL is invalid, maybe it's just a domain name already
+                if (!url.includes('/') && url.includes('.')) {
+                    return url.replace(/^www\./, '');
+                }
                 console.error("Invalid URL:", url, e);
-                return url; // Return original string if parsing fails
+                return url; // Return original string if parsing fails or it's not a standard URL
             }
         }
 
@@ -504,6 +554,7 @@
         // Show a temporary message
         function showMessage(message, duration = 3000) {
             const messageBox = document.getElementById('message-box');
+            if (!messageBox) return; // Exit if message box doesn't exist
             messageBox.textContent = message;
             messageBox.classList.add('show');
 
@@ -522,12 +573,16 @@
 
             // 1. Filter
             let filtered = restaurants.filter(r => {
-                const nameMatch = r.name.toLowerCase().includes(searchTerm);
-                const descriptionMatch = r.description.toLowerCase().includes(searchTerm);
+                // Ensure description exists before calling toLowerCase
+                const description = r.description || "";
+                // Match search term in name or description
+                const searchMatch = r.name.toLowerCase().includes(searchTerm) || description.toLowerCase().includes(searchTerm);
+                // Match category filter
                 const categoryMatch = !selectedCategory || r.category === selectedCategory;
+                // Match type filter
                 const typeMatch = !selectedType || r.type === selectedType;
 
-                return (nameMatch || descriptionMatch) && categoryMatch && typeMatch;
+                return searchMatch && categoryMatch && typeMatch;
             });
 
             // 2. Sort
@@ -539,25 +594,24 @@
                     filtered.sort((a, b) => b.name.localeCompare(a.name));
                     break;
                 case 'rating_asc':
-                    // Handle null/undefined ratings - sort them to the bottom
+                    // Handle null/undefined/NaN ratings - sort them to the bottom (-1)
                     filtered.sort((a, b) => (a.rating ?? -1) - (b.rating ?? -1));
                     break;
                 case 'rating_desc':
-                     // Handle null/undefined ratings - sort them to the bottom
+                     // Handle null/undefined/NaN ratings - sort them to the bottom (-1)
                     filtered.sort((a, b) => (b.rating ?? -1) - (a.rating ?? -1));
                     break;
                 case 'price_asc':
-                    // Sort by length of priceRange string (€ < €€ < €€€)
+                    // Sort by length of priceRange string (€ < €€ < €€€), treat null/undefined as 0 length
                     filtered.sort((a, b) => (a.priceRange?.length ?? 0) - (b.priceRange?.length ?? 0));
                     break;
                 case 'price_desc':
-                     // Sort by length of priceRange string (€€€ > €€ > €)
+                     // Sort by length of priceRange string (€€€ > €€ > €), treat null/undefined as 0 length
                     filtered.sort((a, b) => (b.priceRange?.length ?? 0) - (a.priceRange?.length ?? 0));
                     break;
                 case 'default':
                 default:
-                    // Keep original order (or sort by an implicit order if needed)
-                    // For now, rely on the order after filtering
+                    // Keep original order after filtering (or implement category-based default sort if needed)
                     break;
             }
 
@@ -571,7 +625,7 @@
             const categoryFilter = document.getElementById('filter-category');
             const typeFilter = document.getElementById('filter-type');
 
-            // Get unique categories and types, handling potential null/undefined values
+            // Get unique categories and types, handling potential null/undefined values and sorting
             const categories = [...new Set(restaurants.map(r => r.category).filter(Boolean))].sort();
             const types = [...new Set(restaurants.map(r => r.type).filter(Boolean))].sort();
 
@@ -598,21 +652,31 @@
             const categoryFilter = document.getElementById('filter-category');
             const typeFilter = document.getElementById('filter-type');
             const sortOptions = document.getElementById('sort-options');
-            // const applyButton = document.getElementById('apply-filters-button'); // If using apply button
 
-            // Filter/Sort on change
-            searchInput.addEventListener('input', filterAndSortRestaurants);
+            // Debounce function to limit filter updates on rapid input
+            let debounceTimer;
+            function debouncedFilter() {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(filterAndSortRestaurants, 250); // Adjust delay (ms) as needed
+            }
+
+            // Filter/Sort on change/input
+            searchInput.addEventListener('input', debouncedFilter); // Use debounced version for search
             categoryFilter.addEventListener('change', filterAndSortRestaurants);
             typeFilter.addEventListener('change', filterAndSortRestaurants);
             sortOptions.addEventListener('change', filterAndSortRestaurants);
-
-            // If using an apply button:
-            // applyButton.addEventListener('click', filterAndSortRestaurants);
         }
 
 
         // --- Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
+            // Make sure Leaflet (L) is loaded before proceeding
+            if (typeof L === 'undefined') {
+                console.error("Leaflet library not loaded!");
+                showMessage("Error loading map component. Please refresh.", 5000);
+                return;
+            }
+
             try {
                 initMap();
                 populateFilters();
@@ -620,11 +684,10 @@
                 displayRestaurants(restaurants); // Initial display of all restaurants
             } catch (error) {
                 console.error("Error initializing the page:", error);
-                showMessage("Error loading restaurant data. Please try refreshing.", 5000);
+                showMessage("Error loading restaurant data or map. Please try refreshing.", 5000);
             }
         });
 
     </script>
 </body>
 </html>
-
