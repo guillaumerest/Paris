@@ -4,163 +4,186 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Guillaume's Paris Restaurant Guide</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script> <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <style>
-        /* Custom CSS for the message box */
-        #message-box {
-            display: none;
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #f0fdf4;
-            color: #15803d;
-            padding: 16px;
-            border-radius: 6px;
-            border: 1px solid #16a34a;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-        }
-        #message-box.show {
-            display: block;
-        }
-
-        .restaurant-section {
-            margin-bottom: 60px;
-        }
-
-        .restaurant-section h2 {
-            font-size: 24px;
-            font-weight: bold;
-            color: #2d3748;
-            margin-bottom: 20px;
-            text-align: center;
-            border-bottom: 2px solid #e2e8f0;
-            padding-bottom: 10px;
-        }
-
-        .restaurant-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-
-        @media (min-width: 768px) {
-            .restaurant-list {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (min-width: 1280px) {
-            .restaurant-list {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        .restaurant-item {
-            background-color: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .restaurant-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .restaurant-name {
-            font-size: 18px;
-            font-weight: 600;
-            color: #2d3748;
-            margin-bottom: 10px;
-        }
-
-        .restaurant-details {
-            font-size: 16px;
-            color: #4a5568;
-            margin-bottom: 10px;
-        }
-
-        .restaurant-details strong {
-            color: #718096;
-        }
-
-        .restaurant-website {
-            display: block;
-            color: #4299e1;
-            text-decoration: none;
-            margin-top: 10px;
-            transition: color 0.2s ease;
-            font-weight: 500;
-        }
-
-        .restaurant-website:hover {
-            color: #2b6cb0;
-        }
-
-        .map-link {
-            display: block;
-            color: white;
-            background-color: #63b3ed;
-            padding: 10px 16px;
-            border-radius: 8px;
-            text-decoration: none;
-            text-align: center;
-            margin-top: 15px;
-            transition: background-color 0.2s ease;
-            font-weight: 600;
-        }
-
-        .map-link:hover {
-            background-color: #3182ce;
-        }
-
-        .price-range {
-            font-size: 16px;
-            color: #1a202c;
-            margin-bottom: 10px;
-        }
-
-        .restaurant-category{
-            font-size: 16px;
-            color: #1a202c;
-            margin-bottom: 10px;
+      @font-face {
+        font-family: 'LucideIcons';
+        src: url('https://cdn.jsdelivr.net/npm/lucide-static@latest/font/Lucide.ttf') format('truetype');
+      }
+      .lucide {
+        font-family: 'LucideIcons';
+        font-size: 1.25rem; /* Adjust size as needed */
+        line-height: 1;
+        display: inline-block;
+        vertical-align: middle;
+      }
+    </style>
+    <style>
+        /* Custom CSS */
+        body {
+            font-family: 'Inter', sans-serif;
         }
 
         /* Style for the message box */
         #message-box {
-            display: none;
+            display: none; /* Hidden by default */
             position: fixed;
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background-color: #f0fdf4;
-            color: #15803d;
+            background-color: #f0fdf4; /* Light green background */
+            color: #15803d; /* Dark green text */
             padding: 16px;
-            border-radius: 6px;
-            border: 1px solid #16a34a;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
+            border-radius: 8px; /* Rounded corners */
+            border: 1px solid #16a34a; /* Green border */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            z-index: 1000; /* Ensure it's on top */
+            opacity: 0; /* Start invisible for transition */
+            transition: opacity 0.3s ease-in-out;
         }
 
         #message-box.show {
-            display: block;
+            display: block; /* Make it visible */
+            opacity: 1; /* Fade in */
+        }
+
+        /* Styling for restaurant category sections */
+        .restaurant-category-section {
+            margin-bottom: 2.5rem; /* Increased bottom margin */
+            padding-top: 1.5rem; /* Add padding top for spacing */
+        }
+
+        .restaurant-category-title {
+            font-size: 1.75rem; /* Larger font size */
+            font-weight: 600; /* Semi-bold */
+            color: #1f2937; /* Darker gray text */
+            margin-bottom: 1.5rem; /* Increased margin below title */
+            text-align: left; /* Align title to the left */
+            border-bottom: 2px solid #e5e7eb; /* Lighter border */
+            padding-bottom: 0.75rem; /* Padding below text */
+        }
+
+        /* Styling for individual restaurant cards */
+        .restaurant-item {
+            background-color: white;
+            border-radius: 12px; /* Slightly more rounded corners */
+            padding: 1.5rem; /* Increased padding */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); /* Softer shadow */
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%; /* Ensure cards in a row have same height */
+            border: 1px solid #e5e7eb; /* Subtle border */
+        }
+
+        .restaurant-item:hover {
+            transform: translateY(-4px); /* Slightly less lift */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Slightly stronger shadow on hover */
+        }
+
+        .restaurant-name {
+            font-size: 1.25rem; /* Larger name */
+            font-weight: 600;
+            color: #111827; /* Even darker gray for name */
+            margin-bottom: 0.75rem;
+        }
+
+        .restaurant-description {
+            font-size: 0.95rem; /* Slightly smaller description */
+            color: #4b5563; /* Medium gray for description */
+            margin-bottom: 1rem;
+            flex-grow: 1; /* Allow description to take available space */
+        }
+
+        .restaurant-details {
+            font-size: 0.9rem;
+            color: #6b7280; /* Lighter gray for details */
+            margin-bottom: 0.5rem;
+        }
+
+        .restaurant-details strong {
+            color: #374151; /* Darker gray for labels */
+            font-weight: 500;
+        }
+
+        /* Rating display */
+        .rating-stars {
+            color: #f59e0b; /* Amber color for stars */
+            display: inline-block;
+        }
+
+        /* Map link button */
+        .map-link {
+            display: inline-flex; /* Use inline-flex for icon alignment */
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem; /* Space between icon and text */
+            color: white;
+            background-color: #3b82f6; /* Tailwind blue-500 */
+            padding: 0.6rem 1rem; /* Adjusted padding */
+            border-radius: 8px;
+            text-decoration: none;
+            text-align: center;
+            margin-top: 1rem;
+            transition: background-color 0.2s ease;
+            font-weight: 500; /* Medium weight */
+            border: none;
+            cursor: pointer;
+        }
+
+        .map-link:hover {
+            background-color: #2563eb; /* Tailwind blue-600 */
+        }
+
+        /* Ensure map resizes properly */
+        #map {
+            height: 450px; /* Slightly taller map */
+            border-radius: 12px; /* Match card rounding */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb;
+            margin-bottom: 2rem;
+        }
+
+        /* Responsive grid */
+        #restaurant-sections-container {
+            width: 100%;
+        }
+
+        .restaurant-grid {
+            display: grid;
+            grid-template-columns: 1fr; /* 1 column by default */
+            gap: 1.5rem; /* Consistent gap */
+        }
+
+        @media (min-width: 768px) { /* Medium screens */
+            .restaurant-grid {
+                grid-template-columns: repeat(2, 1fr); /* 2 columns */
+            }
+        }
+
+        @media (min-width: 1024px) { /* Large screens */
+            .restaurant-grid {
+                grid-template-columns: repeat(3, 1fr); /* 3 columns */
+            }
+        }
+
+        /* Add some padding to the filter/search section */
+        #search-filter {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb;
+            margin-bottom: 2rem;
         }
     </style>
     <script>
+        // Tailwind Configuration (optional, if needed for specifics)
         tailwind.config = {
             theme: {
                 extend: {
@@ -172,609 +195,436 @@
         }
     </script>
 </head>
-<body class="bg-gray-100 font-inter">
-    <div class="container mx-auto p-6">
-        <h1 class="text-3xl font-semibold text-gray-800 text-center mb-8">Guillaume's Paris Restaurant Guide</h1>
+<body class="bg-gray-50 font-inter"> <div class="container mx-auto p-4 md:p-8"> <header class="text-center mb-10">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Guillaume's Paris Restaurant Guide</h1>
+            <p class="text-lg text-gray-600">Your curated list of Parisian culinary delights</p>
+        </header>
 
-        <div id="search-filter" class="flex flex-col md:flex-row gap-4 mb-6">
-            <input
-                type="text"
-                id="search-input"
-                placeholder="Search restaurants..."
-                class="w-full md:w-1/2 px-4 py-2 rounded-md border border-gray-300 shadow-sm focus:ring focus:ring-indigo-200 focus:outline-none"
-            />
-            <select id="filter-type" class="w-full md:w-1/4 px-4 py-2 rounded-md border border-gray-300 shadow-sm focus:ring focus:ring-indigo-200 focus:outline-none">
-                <option value="">All Types</option>
-                <option value="French">French</option>
-                <option value="Italian">Italian</option>
-                <option value="Japanese">Japanese</option>
-                <option value="Chinese">Chinese</option>
-                <option value="American">American</option>
-                 <option value="Indian">Indian</option>
-                <option value="Thai">Thai</option>
-                <option value="Vietnamese">Vietnamese</option>
-                <option value="Mexican">Mexican</option>
-                <option value="Spanish">Spanish</option>
-            </select>
-            <select id="sort-options" class="w-full md:w-1/4 px-4 py-2 rounded-md border border-gray-300 shadow-sm focus:ring focus:ring-indigo-200 focus:outline-none">
-                <option value="name">Name</option>
-                <option value="type">Type</option>
-                <option value="rating">Rating</option>
-            </select>
-            <button id="sort-button" class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Sort</button>
-        </div>
-
-        <div id="message-box" class="hidden"></div>
-
-        <div id="map" class="rounded-md shadow-lg mb-6" style="height: 400px;"></div>
-
-        <div id="restaurant-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div id="search-filter" class="flex flex-col md:flex-row gap-4 mb-8 items-center">
+            <div class="relative flex-grow w-full md:w-auto">
+                 <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                    <i class="lucide text-gray-400">&#xea1c;</i> </span>
+                 <input
+                    type="text"
+                    id="search-input"
+                    placeholder="Search by name or description..."
+                    class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none"
+                 />
             </div>
+
+            <select id="filter-category" class="w-full md:w-auto px-4 py-2 rounded-lg border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none bg-white">
+                <option value="">All Categories</option>
+                </select>
+
+            <select id="filter-type" class="w-full md:w-auto px-4 py-2 rounded-lg border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none bg-white">
+                <option value="">All Types</option>
+                </select>
+
+            <select id="sort-options" class="w-full md:w-auto px-4 py-2 rounded-lg border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none bg-white">
+                <option value="default">Default Order</option>
+                <option value="name_asc">Name (A-Z)</option>
+                <option value="name_desc">Name (Z-A)</option>
+                <option value="rating_asc">Rating (Low-High)</option>
+                <option value="rating_desc">Rating (High-Low)</option>
+                <option value="price_asc">Price (Low-High)</option>
+                <option value="price_desc">Price (High-Low)</option>
+            </select>
+            </div>
+
+        <div id="message-box"></div>
+
+        <div id="map"></div>
+
+        <div id="restaurant-sections-container">
+            </div>
+
     </div>
 
     <script>
+        // --- Data ---
         const restaurants = [
-            {
-                name: "Le Bouillon Chartier",
-                category: "Traditional & Classic French Dining",
-                description: "Traditional French Brasserie in the 9th Arrondissement, famed for its Belle Époque décor, bustling atmosphere, classic dishes, and extremely low prices.",
-                type: "French",
-                address: "7 Rue du Faubourg Montmartre, 75009 Paris, France",
-                rating: 4.5,
-                priceRange: "€",
-                mapUrl: "https://www.google.com/maps/place/Le+Bouillon+Chartier/@48.870341,2.346744,17z",
-                latitude: 48.870341,
-                longitude: 2.346744,
-            },
-            {
-                name: "Le Consulat",
-                category: "Traditional & Classic French Dining",
-                description: "A classic French café/brasserie in Montmartre (18th Arrondissement) known for its picturesque façade and deep historical charm.",
-                type: "French",
-                address: "18 Rue Norvins, 75018 Paris, France",
-                rating: 4,
-                priceRange: "€",
-                mapUrl: "https://www.google.com/maps/place/Le+Consulat/@48.886171,2.342745,17z",
-                latitude: 48.886171,
-                longitude: 2.342745,
-            },
-            {
-                name: "La Maison Rose",
-                category: "Traditional & Classic French Dining",
-                description: "Historic restaurant & café in Montmartre (18th Arrondissement) celebrated for its iconic pink building, artistically inspired history, and seasonal French/Italian fare.",
-                type: "French/Italian",
-                address: "2 Rue de l'Abreuvoir, 75018 Paris, France",
-                rating: 4.3,
-                priceRange: "€€",
-                mapUrl: "https://www.google.com/maps/place/La+Maison+Rose/@48.887114,2.341584,17z",
-                latitude: 48.887114,
-                longitude: 2.341584,
-            },
-            {
-                name: "Le Coq & Fils",
-                category: "Traditional & Classic French Dining",
-                description: "Upscale poultry‑focused bistro in Montmartre (18th Arrondissement) that highlights exceptional poultry breeds and roast preparations.",
-                type: "French",
-                address: "19 Rue Saint-Honoré, 75001 Paris, France",
-                rating: 4.6,
-                priceRange: "€€€",
-                mapUrl: "https://www.google.com/maps/place/Le+Coq+&+Fils/@48.863416,2.337544,17z",
-                latitude: 48.863416,
-                longitude: 2.337544,
-            },
-            {
-                name: "Jouvence",
-                category: "Traditional & Classic French Dining",
-                description: "A modern bistro and wine bar in the 12th Arrondissement known for its seasonal market cuisine and excellent natural wine selection in a cozy setting.",
-                type: "French",
-                address: "9 Rue Crozatier, 75012 Paris, France",
-                rating: 4.4,
-                priceRange: "€€",
-                mapUrl: "https://www.google.com/maps/place/Jouvence/@48.848717,2.375825,17z",
-                latitude: 48.848717,
-                longitude: 2.375825,
-            },
-            {
-                name: "Chez Georges",
-                category: "Traditional & Classic French Dining",
-                description: "A classic Parisian bistro near Place des Victoires in the 2nd Arrondissement, keeping its traditional décor and serving dishes like sole meunière and steak frites.",
-                type: "French",
-                address: "1 Rue du Mail, 75002 Paris, France",
-                rating: 4.7,
-                priceRange: "€€",
-                mapUrl: "https://www.google.com/maps/place/Chez+Georges/@48.866556,2.338972,17z",
-                latitude: 48.866556,
-                longitude: 2.338972,
-            },
-            {
-                name: "Le Bon Georges",
-                category: "Traditional & Classic French Dining",
-                description: "A high‑quality bistro in the Saint‑Georges area of the 9th Arrondissement, renowned for top-sourced ingredients and a refined wine list.",
-                type: "French",
-                address: "45 Rue Saint-Georges, 75009 Paris, France",
-                rating: 4.5,
-                priceRange: "€€€",
-                mapUrl: "https://www.google.com/maps/place/Le+Bon+Georges/@48.881122,2.337184,17z",
-                latitude: 48.881122,
-                longitude: 2.337184,
-            },
-            {
-                name: "Gallopin",
-                category: "Traditional & Classic French Dining",
-                description: "Grand historic brasserie in the Bourse area (2nd Arrondissement) with Belle Époque décor and a glass‑roofed garden room.",
-                type: "French",
-                address: "40 Rue Notre Dame des Victoires, 75002 Paris, France",
-                rating: 4.4,
-                priceRange: "€€€",
-                mapUrl: "https://www.google.com/maps/place/Gallopin/@48.867556,2.342555,17z",
-                latitude: 48.867556,
-                longitude: 2.342555,
-            },
-            {
-                name: "Ose",
-                category: "Traditional & Classic French Dining",
-                description: "A modern neighborhood restaurant in Abbesses (Montmartre) offering creative small plates with a modern twist.",
-                type: "French",
-                address: "7 Rue de la Butte Montmartre, 75018 Paris, France",
-                rating: 4.3,
-                priceRange: "€€",
-                mapUrl: "https://www.google.com/maps/place/Ose/@48.885944,2.341861,17z",
-                latitude: 48.885944,
-                longitude: 2.341861,
-            },
-            {
-                name: "La Mascotte Montmartre",
-                category: "Traditional & Classic French Dining",
-                description: "Historic seafood brasserie in Montmartre known for oysters and an Art Deco interior.",
-                type: "French",
-                address: "52 Rue des Abbesses, 75018 Paris, France",
-                rating: 4.2,
-                priceRange: "€€€",
-                mapUrl: "https://www.google.com/maps/place/La+Mascotte+Montmartre/@48.884972,2.339277,17z",
-                latitude: 48.884972,
-                longitude: 2.339277,
-            },
-            {
-                name: "La Marine",
-                category: "Traditional & Classic French Dining",
-                description: "Bistro along Canal Saint‑Martin offering classic French fare and great terrace seating.",
-                type: "French",
-                address: "72 Quai de Valmy, 75010 Paris, France",
-                rating: 4.1,
-                priceRange: "€€",
-                mapUrl: "https://www.google.com/maps/place/La+Marine/@48.870556,2.363333,17z",
-                latitude: 48.870556,
-                longitude: 2.363333,
-            },
-            {
-                name: "Bistrotters",
-                category: "Modern & Innovative French Dining",
-                description: "Modern bistro in the 14th Arrondissement offering creative tasting menus and excellent value.",
-                type: "French",
-                address: "9 Rue Decrès, 75014 Paris, France",
-                rating: 4.4,
-                priceRange: "€€",
-                mapUrl: "https://www.google.com/maps/place/Bistrotters/@48.835722,2.316805,17z",
-                latitude: 48.835722,
-                longitude: 2.316805,
-            },
-            {
-                name: "Aux Plumes",
-                category: "Modern & Innovative French Dining",
-                description: "Intimate modern dining with Spanish-influenced creative tasting menus in the 14th Arrondissement.",
-                type: "French",
-                address: "25 Rue Boulard, 75014 Paris, France",
-                rating: 4.5,
-                priceRange: "€€",
-                mapUrl: "https://www.google.com/maps/place/Aux+Plumes/@48.836528,2.327194,17z",
-                latitude: 48.836528,
-                longitude: 2.327194,
-            },
-            {
-                name: "Tadam",
-                category: "Modern & Innovative French Dining",
-                description: "Inventive, market-driven cuisine and natural wines in the 13th Arrondissement.",
-                type: "French",
-                address: "4 Rue d'Aligre, 75012 Paris, France",
-                rating: 4.3,
-                priceRange: "€€",
-                mapUrl: "https://www.google.com/maps/place/Tadam/@48.849444,2.376388,17z",
-                latitude: 48.849444,
-                longitude: 2.376388,
-            },
-            {
-                name: "Kokoro",
-                category: "World Cuisine & Fusion",
-                description: "Refined French-Japanese fusion cuisine in the Latin Quarter (5th Arrondissement).",
-                type: "French-Japanese Fusion",
-                address: "36 bis Rue des Boulangers, 75005 Paris, France",
-                rating: 4.6,
-                priceRange: "€€",
-                mapUrl: "https://www.google.com/maps/place/Kokoro/@48.849166,2.354166,17z",
-                latitude: 48.849166,
-                longitude: 2.354166,
-            },
-            {
-                name: "Jinchan Shokudo",
-                category: "World Cuisine & Fusion",
-                description: "Casual Japanese canteen near Palais Royal (1st Arrondissement) with specialties in curry and udon.",
-                type: "Japanese",
-                address: "8 Rue Gomboust, 75001 Paris, France",
-                rating: 4.2,
-                priceRange: "€",
-                mapUrl: "https://www.google.com/maps/place/Jinchan+Shokudo/@48.867638,2.336805,17z",
-                latitude: 48.867638,
-                longitude: 2.336805,
-            },
-            {
-                name: "Abri Soba",
-                category: "World Cuisine & Fusion",
-                description: "Specialist in house-made soba noodles and tempura in the 9th Arrondissement.",
-                type: "Japanese",
-                address: "10 Rue Saulnier, 75009 Paris, France",
-                rating: 4.4,
-                priceRange: "€€",
-                mapUrl: "https://www.google.com/maps/place/Abri+Soba/@48.873222,2.345611,17z",
-                latitude: 48.873222,
-                longitude: 2.345611,
-            },
-            {
-                name: "La Perruche",
-                category: "Rooftops, Terraces & Festive Dining",
-                description: "Rooftop restaurant atop Printemps Haussmann offering Mediterranean dishes and chic vibes.",
-                type: "Mediterranean",
-                address: "64 Boulevard Haussmann, 75009 Paris, France",
-                rating: 4.3,
-                priceRange: "€€€",
-                mapUrl: "https://www.google.com/maps/place/La+Perruche/@48.873888,2.331944,17z",
-                latitude: 48.873888,
-                longitude: 2.331944,
-            },
-            {
-                name: "Les Ombres",
-                category: "Rooftops, Terraces & Festive Dining",
-                description: "Fine dining with Eiffel Tower views at Musée du Quai Branly.",
-                type: "French",
-                address: "27 Quai Branly, 75007 Paris, France",
-                rating: 4.5,
-                priceRange: "€€€",
-                mapUrl: "https://www.google.com/maps/place/Les+Ombres/@48.858277,2.299861,17z",
-                latitude: 48.858277,
-                longitude: 2.299861,
-            },
-            {
-                name: "L'Oiseau Blanc",
-                category: "Rooftops, Terraces & Festive Dining",
-                description: "Michelin-starred rooftop restaurant at The Peninsula Paris with aviation-themed décor and Eiffel Tower views.",
-                type: "French",
-                address: "19 Avenue Kléber, 75116 Paris, France",
-                rating: 4.8,
-                priceRange: "€€€",
-                mapUrl: "https://www.google.com/maps/place/L'Oiseau+Blanc/@48.863611,2.293611,17z",
-                latitude: 48.863611,
-                longitude: 2.293611,
-            },
-            {
-                name: "Hollywood Savoy",
-                category: "Rooftops, Terraces & Festive Dining",
-                description: "Festive Italian-leaning brasserie in the Bourse area known for its party atmosphere.",
-                type: "Italian",
-                address: "7 Rue de la Bourse, 75002 Paris, France",
-                rating: 4.2,
-                priceRange: "€€",
-                mapUrl: "https://www.google.com/maps/place/Hollywood+Savoy/@48.868333,2.341111,17z",
-                latitude: 48.868333,
-                longitude: 2.341111,
-            },
-            {
-                name: "Les Jardins du Presbourg",
-                category: "Rooftops, Terraces & Festive Dining",
-                description: "Chic terrace bar and restaurant near Arc de Triomphe with trendy all-day dining.",
-                type: "French",
-                address: "12 Avenue de Presbourg, 75016 Paris, France",
-                rating: 4.1,
-                priceRange: "€€€",
-                mapUrl: "https://www.google.com/maps/place/Les+Jardins+du+Presbourg/@48.873611,2.295277,17z",
-                latitude: 48.873611,
-                longitude: 2.295277,
-            },
-            {
-                name: "Le Comptoir Général",
-                category: "Rooftops, Terraces & Festive Dining",
-                description: "Quirky bar and restaurant on Canal Saint‑Martin with eclectic décor and brunch scene.",
-                type: "Bar/Restaurant",
-                address: "80 Quai de Jemmapes, 75010 Paris, France",
-                rating: 4.0,
-                priceRange: "€€",
-                mapUrl: "https://www.google.com/maps/place/Le+Comptoir+G%C3%A9n%C3%A9ral/@48.869722,2.366388,17z",
-                latitude: 48.869722,
-                longitude: 2.366388,
-            },
-            {
-                name: "Rosa Bonheur (Buttes Chaumont)",
-                category: "Rooftops, Terraces & Festive Dining",
-                description: "Guinguette-style bar and café in Parc des Buttes-Chaumont known for dancing and sunshine.",
-                type: "Bar/Café",
-                address: "Parc des Buttes Chaumont, 75019 Paris, France",
-                rating: 4.3,
-                priceRange: "€",
-                mapUrl: "https://www.google.com/maps/place/Rosa+Bonheur/@48.879166,2.374444,17z",
-                latitude: 48.879166,
-                longitude: 2.374444,
-            },
-            {
-                name: "Le Perchoir Ménilmontant",
-                category: "Rooftops, Terraces & Festive Dining",
-                description: "Trendy rooftop with city views, cocktails, and a young Parisian crowd in the 11th.",
-                type: "Bar/Restaurant",
-                address: "14 Rue Crespin du Gast, 75011 Paris, France",
-                rating: 4.2,
-                priceRange: "€€",
-                mapUrl: "https://www.google.com/maps/place/Le+Perchoir+M%C3%A9nilmontant/@48.863888,2.392777,17z",
-                latitude: 48.863888,
-                longitude: 2.392777,
-            },
-            {
-                name: "Classique",
-                category: "Bars & Nightlife",
-                description: "Café by day, cocktail lounge by night with a lovely terrace in the 9th.",
-                type: "Cocktail Bar",
-                address: "21 Rue Saint-Georges, 75009 Paris, France",
-                rating: 4.4,
-                priceRange: "€€",
-                mapUrl: "https://www.google.com/maps/place/Classique/@48.880833,2.336111,17z",
-                latitude: 48.880833,
-                longitude: 2.336111,
-            },
-            {
-                name: "Combat",
-                category: "Bars & Nightlife",
-                description: "Craft cocktail bar with a female-led team in Belleville.",
-                type: "Cocktail Bar",
-                address: "63 Rue de Belleville, 75019 Paris, France",
-                rating: 4.5,
-                priceRange: "€€",
-                mapUrl: "https://www.google.com/maps/place/Combat/@48.871388,2.383888,17z",
-                latitude: 48.871388,
-                longitude: 2.383888,
-            },
-            {
-                name: "Castor Club",
-                category: "Bars & Nightlife",
-                description: "Cozy “log cabin” cocktail bar in Saint-Germain-des-Prés.",
-                type: "Cocktail Bar",
-                address: "14 Rue Saint-Benoît, 75006 Paris, France",
-                rating: 4.6,
-                priceRange: "€€",
-                mapUrl: "https://www.google.com/maps/place/Castor+Club/@48.854166,2.324722,17z",
-                latitude: 48.854166,
-                longitude: 2.324722,
-            },
-            {
-                name: "Brigitte",
-                category: "Bars & Nightlife",
-                description: "Laid-back cocktail spot in the Oberkampf area with consistently good drinks.",
-                type: "Cocktail Bar",
-                address: "11 Rue Frochot, 75009 Paris, France",
-                rating: 4.3,
-                priceRange: "€€",
-                mapUrl: "https://www.google.com/maps/place/Brigitte/@48.882222,2.338611,17z",
-                latitude: 48.882222,
-                longitude: 2.338611,
-            },
-            {
-                name: "Le Syndicat",
-                category: "Bars & Nightlife",
-                description: "Hidden speakeasy-style bar focused on French spirits near Gare du Nord.",
-                type: "Cocktail Bar",
-                address: "51 Rue du Faubourg Saint-Denis, 75010 Paris, France",
-                rating: 4.7,
-                priceRange: "€€",
-                mapUrl: "https://www.google.com/maps/place/Le+Syndicat/@48.873055,2.351944,17z",
-                latitude: 48.873055,
-                longitude: 2.351944,
-            },
-            {
-                name: "Gravity Bar",
-                category: "Bars & Nightlife",
-                description: "Modern cocktail bar with stunning design and small plates in Canal Saint-Martin.",
-                type: "Cocktail Bar",
-                address: "44 Rue des Vinaigriers, 75010 Paris, France",
-                rating: 4.4,
-                priceRange: "€€",
-                mapUrl: "https://www.google.com/maps/place/Gravity+Bar/@48.871111,2.365277,17z",
-                latitude: 48.871111,
-                longitude: 2.365277,
-            },
-            {
-                name: "Le Baron Rouge",
-                category: "Bars & Nightlife",
-                description: "Bustling wine bar near Marché d’Aligre with wines by the barrel and oysters.",
-                type: "Wine Bar",
-                address: "1 Rue Théophile Roussel, 75012 Paris, France",
-                rating: 4.5,
-                priceRange: "€",
-                mapUrl: "https://www.google.com/maps/place/Le+Baron+Rouge/@48.848888,2.375555,17z",
-                latitude: 48.848888,
-                longitude: 2.375555,
-            },
-            {
-                name: "Trouble",
-                category: "Bars & Nightlife",
-                description: "Natural wine bar in Pigalle offering great wines and cozy ambiance.",
-                type: "Wine Bar",
-                address: "47 Rue de la Rochefoucauld, 75009 Paris, France",
-                rating: 4.3,
-                priceRange: "€€",
-                mapUrl: "https://www.google.com/maps/place/Trouble/@48.878055,2.337222,17z",
-                latitude: 48.878055,
-                longitude: 2.337222,
-            },
-            {
-                name: "Canailles",
-                category: "Bars & Nightlife",
-                description: "Canal-side natural wine bar with excellent plates for sharing.",
-                type: "Wine Bar",
-                address: "12 Rue de la Fontaine au Roi, 75011 Paris, France",
-                rating: 4.2,
-                priceRange: "€€",
-                mapUrl: "https://www.google.com/maps/place/Canailles/@48.865833,2.368611,17z",
-                latitude: 48.865833,
-                longitude: 2.368611,
-            },
-            {
-                name: "Brigat",
-                category: "Pâtisseries & Bakeries",
-                description: "Elegant pâtisserie in the 17th known for creative, visually striking desserts.",
-                type: "Pâtisserie",
-                address: "12 Rue du Dôme, 75016 Paris, France",
-                rating: 4.7,
-                priceRange: "€€",
-                mapUrl: "https://www.google.com/maps/place/Brigat/@48.869444,2.288611,17z",
-                latitude: 48.869444,
-                longitude: 2.288611,
-            },
-            {
-                name: "Babka Zana",
-                category: "Pâtisseries & Bakeries",
-                description: "Famous for their pistachio and chocolate babka in the 9th.",
-                type: "Pâtisserie",
-                address: "65 Rue Condorcet, 75009 Paris, France",
-                rating: 4.6,
-                priceRange: "€€",
-                mapUrl: "https://www.google.com/maps/place/Babka+Zana/@48.882777,2.343055,17z",
-                latitude: 48.882777,
-                longitude: 2.343055,
-            },
-            {
-                name: "Mamiche",
-                category: "Pâtisseries & Bakeries",
-                description: "Beloved bakery straddling the 9th & 10th, with queues for sourdough and viennoiseries.",
-                type: "Bakery",
-                address: "45 Rue Condorcet, 75009 Paris, France",
-                rating: 4.5,
-                priceRange: "€€",
-                mapUrl: "https://www.google.com/maps/place/Mamiche/@48.8825,2.342777,17z",
-                latitude: 48.8825,
-                longitude: 2.342777,
-            },
-            {
-                name: "Boneshaker",
-                category: "Pâtisseries & Bakeries",
-                description: "American-style artisanal doughnut shop in the 2nd Arrondissement.",
-                type: "Doughnut Shop",
-                address: "86 Rue d'Aboukir, 75002 Paris, France",
-                rating: 4.4,
-                priceRange: "€€",
-                mapUrl: "https://www.google.com/maps/place/Boneshaker/@48.866388,2.345833,17z",
-                latitude: 48.866388,
-                longitude: 2.345833,
-            },
-             {
-                name: "Plaq",
-                category: "Pâtisseries & Bakeries",
-                description: "Minimalist bean-to-bar chocolatier in the 2nd with premium single-origin chocolate.",
-                type: "Chocolatier",
-                address: "4 Rue du Nil, 75002 Paris, France",
-                rating: 4.7,
-                priceRange: "€€",
-                mapUrl: "https://www.google.com/maps/place/Plaq/@48.864722,2.346388,17z",
-                latitude: 48.864722,
-                longitude: 2.346388,
-            },
-            {
-                name: "JJ Hings",
-                category: "Pâtisseries & Bakeries",
-                description: "Creative ice cream shop near Canal Saint‑Martin offering gourmet flavors and sourdough cones.",
-                type: "Ice Cream Shop",
-                address: "8 bis Rue de la Martinique, 75010 Paris, France",
-                rating: 4.6,
-                priceRange: "€€",
-                mapUrl: "https://www.google.com/maps/place/JJ+Hings/@48.871944,2.371388,17z",
-                latitude: 48.871944,
-                longitude: 2.371388,
-            },
+             // --- Traditional & Classic French Dining ---
+            { name: "Le Bouillon Chartier", category: "Traditional & Classic French Dining", description: "Traditional French Brasserie in the 9th Arrondissement, famed for its Belle Époque décor, bustling atmosphere, classic dishes, and extremely low prices.", type: "French Brasserie", address: "7 Rue du Faubourg Montmartre, 75009 Paris", rating: 4.0, priceRange: "€", latitude: 48.8722, longitude: 2.3444, website: "https://www.bouillon-chartier.com/en/" },
+            { name: "Le Consulat", category: "Traditional & Classic French Dining", description: "A classic French café/brasserie in Montmartre (18th Arrondissement) known for its picturesque façade and deep historical charm.", type: "French Cafe/Brasserie", address: "18 Rue Norvins, 75018 Paris", rating: 3.8, priceRange: "€€", latitude: 48.8867, longitude: 2.3399, website: null },
+            { name: "La Maison Rose", category: "Traditional & Classic French Dining", description: "Historic restaurant & café in Montmartre (18th Arrondissement) celebrated for its iconic pink building, artistically inspired history, and seasonal French/Italian fare.", type: "French/Italian", address: "2 Rue de l'Abreuvoir, 75018 Paris", rating: 4.1, priceRange: "€€", latitude: 48.8875, longitude: 2.3393, website: "https://lamaisonrose-montmartre.com/en" },
+            { name: "Le Coq & Fils", category: "Traditional & Classic French Dining", description: "Upscale poultry‑focused bistro in Montmartre (18th Arrondissement) that highlights exceptional poultry breeds and roast preparations.", type: "French Bistro (Poultry)", address: "98 Rue Lepic, 75018 Paris", rating: 4.5, priceRange: "€€€", latitude: 48.8871, longitude: 2.3376, website: "https://lecoqetfils.com/en/" }, // Updated address and rating
+            { name: "Jouvence", category: "Traditional & Classic French Dining", description: "A modern bistro and wine bar in the 12th Arrondissement known for its seasonal market cuisine and excellent natural wine selection in a cozy setting.", type: "French Bistro/Wine Bar", address: "17 Rue Chanzy, 75011 Paris", rating: 4.6, priceRange: "€€", latitude: 48.8533, longitude: 2.3836, website: "https://www.jouvence.paris/" }, // Updated address and rating
+            { name: "Chez Georges", category: "Traditional & Classic French Dining", description: "A classic Parisian bistro near Place des Victoires in the 2nd Arrondissement, keeping its traditional décor and serving dishes like sole meunière and steak frites.", type: "French Bistro", address: "1 Rue du Mail, 75002 Paris", rating: 4.4, priceRange: "€€€", latitude: 48.8675, longitude: 2.3409, website: null }, // Updated rating
+            { name: "Le Bon Georges", category: "Traditional & Classic French Dining", description: "A high‑quality bistro in the Saint‑Georges area of the 9th Arrondissement, renowned for top-sourced ingredients and a refined wine list.", type: "French Bistro", address: "45 Rue Saint-Georges, 75009 Paris", rating: 4.6, priceRange: "€€€", latitude: 48.8774, longitude: 2.3385, website: "https://www.lebongeorges.com/en" }, // Updated rating
+            { name: "Gallopin", category: "Traditional & Classic French Dining", description: "Grand historic brasserie in the Bourse area (2nd Arrondissement) with Belle Époque décor and a glass‑roofed garden room.", type: "French Brasserie", address: "40 Rue Notre Dame des Victoires, 75002 Paris", rating: 4.2, priceRange: "€€€", latitude: 48.8687, longitude: 2.3428, website: "https://www.gallopin.com/en/" }, // Updated rating
+            { name: "Ose", category: "Traditional & Classic French Dining", description: "A modern neighborhood restaurant in Abbesses (Montmartre) offering creative small plates with a modern twist.", type: "Modern French", address: "4 Rue Burq, 75018 Paris", rating: 4.7, priceRange: "€€", latitude: 48.8853, longitude: 2.3371, website: "https://www.ose-paris.com/" }, // Updated address and rating
+            { name: "La Mascotte Montmartre", category: "Traditional & Classic French Dining", description: "Historic seafood brasserie in Montmartre known for oysters and an Art Deco interior.", type: "French Seafood Brasserie", address: "52 Rue des Abbesses, 75018 Paris", rating: 4.3, priceRange: "€€€", latitude: 48.8850, longitude: 2.3367, website: "https://www.la-mascotte-montmartre.com/en" }, // Updated rating
+            { name: "La Marine", category: "Traditional & Classic French Dining", description: "Bistro along Canal Saint‑Martin offering classic French fare and great terrace seating.", type: "French Bistro", address: "55 bis Quai de Valmy, 75010 Paris", rating: 4.0, priceRange: "€€", latitude: 48.8718, longitude: 2.3649, website: null }, // Updated address
+
+            // --- Modern & Innovative French Dining ---
+            { name: "Bistrotters", category: "Modern & Innovative French Dining", description: "Modern bistro in the 14th Arrondissement offering creative tasting menus and excellent value.", type: "Modern French Bistro", address: "9 Rue Decrès, 75014 Paris", rating: 4.8, priceRange: "€€", latitude: 48.8336, longitude: 2.3173, website: "https://www.bistrotters.com/" }, // Updated rating
+            { name: "Aux Plumes", category: "Modern & Innovative French Dining", description: "Intimate modern dining with Spanish-influenced creative tasting menus in the 14th Arrondissement.", type: "Modern French/Spanish", address: "45 Rue Boulard, 75014 Paris", rating: 4.7, priceRange: "€€€", latitude: 48.8332, longitude: 2.3282, website: "https://www.auxplumesparis.com/" }, // Updated address and rating
+            { name: "Tadam", category: "Modern & Innovative French Dining", description: "Inventive, market-driven cuisine and natural wines in the 12th Arrondissement.", type: "Modern French/Natural Wine", address: "152 Rue du Faubourg Saint-Antoine, 75012 Paris", rating: 4.5, priceRange: "€€", latitude: 48.8492, longitude: 2.3805, website: null }, // Updated address
+
+            // --- World Cuisine & Fusion ---
+            { name: "Kokoro", category: "World Cuisine & Fusion", description: "Refined French-Japanese fusion cuisine in the Latin Quarter (5th Arrondissement).", type: "French-Japanese Fusion", address: "36 Rue des Boulangers, 75005 Paris", rating: 4.7, priceRange: "€€€", latitude: 48.8468, longitude: 2.3527, website: "https://www.kokoroparis.com/" }, // Updated rating
+            { name: "Jinchan Shokudo", category: "World Cuisine & Fusion", description: "Casual Japanese canteen near Palais Royal (1st Arrondissement) with specialties in curry and udon.", type: "Japanese Canteen", address: "15 Rue des Petits Champs, 75001 Paris", rating: 4.4, priceRange: "€", latitude: 48.8665, longitude: 2.3380, website: null }, // Updated address and rating
+            { name: "Abri Soba", category: "World Cuisine & Fusion", description: "Specialist in house-made soba noodles and tempura in the 9th Arrondissement.", type: "Japanese Soba", address: "10 Rue Saulnier, 75009 Paris", rating: 4.5, priceRange: "€€", latitude: 48.8740, longitude: 2.3453, website: null }, // Updated rating
+
+            // --- Rooftops, Terraces & Festive Dining ---
+            { name: "La Perruche", category: "Rooftops, Terraces & Festive Dining", description: "Rooftop restaurant atop Printemps Haussmann offering Mediterranean dishes and chic vibes.", type: "Mediterranean Rooftop", address: "Printemps de l'Homme, 2 Rue du Havre, 9ème étage, 75009 Paris", rating: 4.0, priceRange: "€€€€", latitude: 48.8738, longitude: 2.3289, website: "https://perruche-paris.com/en/" }, // Updated address and rating
+            { name: "Les Ombres", category: "Rooftops, Terraces & Festive Dining", description: "Fine dining with Eiffel Tower views at Musée du Quai Branly.", type: "Modern French (Fine Dining)", address: "27 Quai Jacques Chirac, 75007 Paris", rating: 4.3, priceRange: "€€€€", latitude: 48.8608, longitude: 2.2976, website: "https://www.lesombres-restaurant.com/en/" }, // Updated address and rating
+            { name: "L'Oiseau Blanc", category: "Rooftops, Terraces & Festive Dining", description: "Michelin-starred rooftop restaurant at The Peninsula Paris with aviation-themed décor and Eiffel Tower views.", type: "French (Fine Dining, Michelin *)", address: "The Peninsula Paris, 19 Avenue Kléber, 75116 Paris", rating: 4.6, priceRange: "€€€€", latitude: 48.8713, longitude: 2.2936, website: "https://www.peninsula.com/en/paris/hotel-fine-dining/loiseau-blanc-rooftop-restaurant" }, // Updated rating
+            { name: "Hollywood Savoy", category: "Rooftops, Terraces & Festive Dining", description: "Festive Italian-leaning brasserie in the Bourse area known for its party atmosphere.", type: "Italian Brasserie", address: "44 Rue Notre Dame des Victoires, 75002 Paris", rating: 4.1, priceRange: "€€€", latitude: 48.8687, longitude: 2.3432, website: "https://www.hollywoodsavoy.com/" }, // Updated address and rating
+            { name: "Les Jardins du Presbourg", category: "Rooftops, Terraces & Festive Dining", description: "Chic terrace bar and restaurant near Arc de Triomphe with trendy all-day dining.", type: "Modern French/International", address: "3 Avenue de la Grande Armée, 75116 Paris", rating: 4.2, priceRange: "€€€", latitude: 48.8740, longitude: 2.2927, website: "https://www.beaumarly.com/en/les-jardins-du-presbourg/" }, // Updated address and rating
+            { name: "Le Comptoir Général", category: "Rooftops, Terraces & Festive Dining", description: "Quirky bar and restaurant on Canal Saint‑Martin with eclectic décor and brunch scene.", type: "Bar/Restaurant (Eclectic)", address: "80 Quai de Jemmapes, 75010 Paris", rating: 4.1, priceRange: "€€", latitude: 48.8728, longitude: 2.3655, website: "https://www.lecomptoirgeneral.com/" }, // Updated rating
+            { name: "Rosa Bonheur (Buttes Chaumont)", category: "Rooftops, Terraces & Festive Dining", description: "Guinguette-style bar and café in Parc des Buttes-Chaumont known for dancing and sunshine.", type: "Bar/Café (Guinguette)", address: "Parc des Buttes Chaumont, 2 Avenue de la Cascade, 75019 Paris", rating: 4.0, priceRange: "€", latitude: 48.8799, longitude: 2.3818, website: "https://www.rosabonheur.fr/rosa-buttes" }, // Updated address and rating
+            { name: "Le Perchoir Ménilmontant", category: "Rooftops, Terraces & Festive Dining", description: "Trendy rooftop with city views, cocktails, and a young Parisian crowd in the 11th.", type: "Rooftop Bar/Restaurant", address: "14 Rue Crespin du Gast, 75011 Paris", rating: 4.0, priceRange: "€€€", latitude: 48.8641, longitude: 2.3806, website: "https://leperchoir.fr/location/le-perchoir-menilmontant/" }, // Updated rating
+
+             // --- Bars & Nightlife ---
+            { name: "Classique", category: "Bars & Nightlife", description: "Café by day, cocktail lounge by night with a lovely terrace in the 9th.", type: "Cocktail Bar/Café", address: "1 bis Rue Lallier, 75009 Paris", rating: 4.5, priceRange: "€€", latitude: 48.8817, longitude: 2.3415, website: "https://classique-paris.com/" }, // Updated address and rating
+            { name: "Combat", category: "Bars & Nightlife", description: "Craft cocktail bar with a female-led team in Belleville.", type: "Cocktail Bar", address: "63 Rue de Belleville, 75019 Paris", rating: 4.6, priceRange: "€€", latitude: 48.8737, longitude: 2.3825, website: "https://combatbelleville.com/" }, // Updated rating
+            { name: "Castor Club", category: "Bars & Nightlife", description: "Cozy “log cabin” cocktail bar in Saint-Germain-des-Prés.", type: "Cocktail Bar", address: "14 Rue Hautefeuille, 75006 Paris", rating: 4.5, priceRange: "€€", latitude: 48.8526, longitude: 2.3413, website: null }, // Updated address
+            { name: "Brigitte", category: "Bars & Nightlife", description: "Laid-back cocktail spot in the Oberkampf area with consistently good drinks.", type: "Cocktail Bar", address: "11 Rue de la Fontaine au Roi, 75011 Paris", rating: 4.4, priceRange: "€€", latitude: 48.8661, longitude: 2.3701, website: null }, // Updated address and rating
+            { name: "Le Syndicat", category: "Bars & Nightlife", description: "Hidden speakeasy-style bar focused on French spirits near Gare du Nord.", type: "Cocktail Bar (Speakeasy)", address: "51 Rue du Faubourg Saint-Denis, 75010 Paris", rating: 4.5, priceRange: "€€€", latitude: 48.8733, longitude: 2.3547, website: "https://syndicatcocktailclub.com/" }, // Updated rating
+            { name: "Gravity Bar", category: "Bars & Nightlife", description: "Modern cocktail bar with stunning design and small plates in Canal Saint-Martin.", type: "Cocktail Bar", address: "44 Rue des Vinaigriers, 75010 Paris", rating: 4.5, priceRange: "€€€", latitude: 48.8711, longitude: 2.3625, website: "https://www.gravitybarparis.com/" }, // Updated rating
+            { name: "Le Baron Rouge", category: "Bars & Nightlife", description: "Bustling wine bar near Marché d’Aligre with wines by the barrel and oysters.", type: "Wine Bar", address: "1 Rue Théophile Roussel, 75012 Paris", rating: 4.6, priceRange: "€", latitude: 48.8490, longitude: 2.3810, website: null }, // Updated rating
+            { name: "Trouble", category: "Bars & Nightlife", description: "Natural wine bar in Pigalle offering great wines and cozy ambiance.", type: "Natural Wine Bar", address: "29 Rue Notre Dame de Lorette, 75009 Paris", rating: 4.6, priceRange: "€€", latitude: 48.8782, longitude: 2.3396, website: null }, // Updated address and rating
+            { name: "Canailles", category: "Bars & Nightlife", description: "Canal-side natural wine bar with excellent plates for sharing.", type: "Natural Wine Bar", address: "12 Rue de la Fontaine au Roi, 75011 Paris", rating: 4.5, priceRange: "€€", latitude: 48.8660, longitude: 2.3700, website: null }, // Updated rating
+
+            // --- Pâtisseries & Bakeries ---
+            { name: "Brigat", category: "Pâtisseries & Bakeries", description: "Elegant pâtisserie in the 17th known for creative, visually striking desserts.", type: "Pâtisserie", address: "6 Rue du Dôme, 75016 Paris", rating: 4.8, priceRange: "€€€", latitude: 48.8691, longitude: 2.2889, website: "https://brigat.fr/" }, // Updated address and rating
+            { name: "Babka Zana", category: "Pâtisseries & Bakeries", description: "Famous for their pistachio and chocolate babka in the 9th.", type: "Bakery/Pâtisserie (Babka)", address: "65 Rue Condorcet, 75009 Paris", rating: 4.7, priceRange: "€€", latitude: 48.8800, longitude: 2.3425, website: "https://www.babkazana.com/" }, // Updated rating
+            { name: "Mamiche", category: "Pâtisseries & Bakeries", description: "Beloved bakery straddling the 9th & 10th, with queues for sourdough and viennoiseries.", type: "Bakery (Sourdough)", address: "45 Rue Condorcet, 75009 Paris", rating: 4.6, priceRange: "€", latitude: 48.8796, longitude: 2.3432, website: "https://www.mamiche.fr/" }, // Updated rating and price
+            { name: "Boneshaker", category: "Pâtisseries & Bakeries", description: "American-style artisanal doughnut shop in the 2nd Arrondissement.", type: "Doughnut Shop", address: "77 Rue d'Aboukir, 75002 Paris", rating: 4.6, priceRange: "€€", latitude: 48.8676, longitude: 2.3466, website: "https://www.boneshakerparis.com/" }, // Updated address and rating
+            { name: "Plaq", category: "Pâtisseries & Bakeries", description: "Minimalist bean-to-bar chocolatier in the 2nd with premium single-origin chocolate.", type: "Chocolatier (Bean-to-Bar)", address: "4 Rue du Nil, 75002 Paris", rating: 4.8, priceRange: "€€€", latitude: 48.8674, longitude: 2.3464, website: "https://plaqchocolat.fr/" }, // Updated rating
+            { name: "JJ Hings", category: "Pâtisseries & Bakeries", description: "Creative ice cream shop near Canal Saint‑Martin offering gourmet flavors and sourdough cones.", type: "Ice Cream Shop", address: "4 Rue de la Grange aux Belles, 75010 Paris", rating: 4.7, priceRange: "€€", latitude: 48.8725, longitude: 2.3645, website: "https://www.jjhings.com/" } // Updated address and rating
         ];
 
+        // --- Global Variables ---
+        let map;
+        let markers = []; // To keep track of markers for filtering
+
+        // --- Map Initialization ---
         function initMap() {
-            const map = L.map('map').setView([48.8566, 2.3522], 12);
+            // Initialize the map centered on Paris
+            map = L.map('map').setView([48.8566, 2.3522], 12); // Paris center, zoom level 12
+
+            // Add OpenStreetMap tile layer
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                maxZoom: 19,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
 
-            restaurants.forEach(restaurant => {
-                const marker = L.marker([restaurant.latitude, restaurant.longitude]).addTo(map);
-                marker.bindPopup(`<b>${restaurant.name}</b><br>${restaurant.type}<br><a href="${restaurant.mapUrl}" target="_blank">View on Map</a>`);
-            });
+             // Add initial markers for all restaurants
+            addMarkers(restaurants);
         }
 
-        function displayRestaurants(filteredRestaurants) {
-            const restaurantList = document.getElementById("restaurant-list");
-            restaurantList.innerHTML = "";
+        // --- Map Markers ---
+         function addMarkers(restaurantsToDisplay) {
+            // Clear existing markers
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
 
-            filteredRestaurants.forEach(restaurant => {
-                const restaurantCard = document.createElement("div");
-                restaurantCard.classList.add("restaurant-item");
-
-                restaurantCard.innerHTML = `
-                    <h2 class="restaurant-name">${restaurant.name}</h2>
-                    <p class="restaurant-category"><span class="font-semibold">Category:</span> ${restaurant.category}</p>
-                    <p class="restaurant-details"><span class="font-semibold">Description:</span> ${restaurant.description}</p>
-                    <p class="restaurant-details"><span class="font-semibold">Type:</span> ${restaurant.type}</p>
-                    <p class="restaurant-details"><span class="font-semibold">Address:</span> ${restaurant.address}</p>
-                    <p class="restaurant-details"><span class="font-semibold">Rating:</span> ${restaurant.rating} ⭐</p>
-                    <p class="price-range"><span class="font-semibold">Price:</span> ${restaurant.priceRange}</p>
-                    <a href="${restaurant.mapUrl}" target="_blank" class="map-link">View on Map</a>
-                `;
-
-                restaurantList.appendChild(restaurantCard);
-            });
-        }
-
-        function filterAndSortRestaurants() {
-            const searchTerm = document.getElementById("search-input").value.toLowerCase();
-            const filterType = document.getElementById("filter-type").value;
-            const sortOption = document.getElementById("sort-options").value;
-            const sortButton = document.getElementById("sort-button");
-
-            let filteredRestaurants = restaurants.filter(restaurant => {
-                return restaurant.name.toLowerCase().includes(searchTerm) &&
-                       (filterType === "" || restaurant.type === filterType);
-            });
-
-             if (sortButton.textContent === "Sort") {
-                if (sortOption === "name") {
-                    filteredRestaurants.sort((a, b) => a.name.localeCompare(b.name));
-                } else if (sortOption === "type") {
-                    filteredRestaurants.sort((a, b) => a.type.localeCompare(b.type));
-                } else if (sortOption === "rating") {
-                    filteredRestaurants.sort((a, b) => b.rating - a.rating);
+            // Add new markers
+            restaurantsToDisplay.forEach(restaurant => {
+                if (restaurant.latitude && restaurant.longitude) {
+                    const marker = L.marker([restaurant.latitude, restaurant.longitude]).addTo(map);
+                    // Create popup content
+                    const popupContent = `
+                        <div class="font-sans">
+                            <strong class="text-base block mb-1">${restaurant.name}</strong>
+                            <span class="text-sm text-gray-600 block mb-1">${restaurant.type} - ${restaurant.priceRange}</span>
+                            <span class="text-sm text-gray-500 block">${restaurant.address}</span>
+                            ${generateGoogleMapsLink(restaurant.name, restaurant.address) ?
+                                `<a href="${generateGoogleMapsLink(restaurant.name, restaurant.address)}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 text-sm mt-1 inline-block">View on Google Maps</a>`
+                                : ''
+                            }
+                        </div>
+                    `;
+                    marker.bindPopup(popupContent);
+                    markers.push(marker); // Store marker reference
                 }
-                sortButton.textContent = "Clear Sort";
-            } else {
-                filteredRestaurants = restaurants;
-                sortButton.textContent = "Sort";
+            });
+
+            // Adjust map view if markers were added and map exists
+            if (markers.length > 0 && map) {
+                 const group = new L.featureGroup(markers);
+                 // Check if map has bounds before fitting
+                 try {
+                    map.fitBounds(group.getBounds().pad(0.1)); // Fit bounds with padding
+                 } catch (e) {
+                    console.warn("Could not fit map bounds, likely no valid markers.", e);
+                    // Fallback: Set default view if fitBounds fails
+                    map.setView([48.8566, 2.3522], 12);
+                 }
+            } else if (map) {
+                 // If no markers, reset to default view
+                 map.setView([48.8566, 2.3522], 12);
             }
-            displayRestaurants(filteredRestaurants);
         }
 
-        function showMessage(message) {
-            const messageBox = document.getElementById("message-box");
+
+        // --- Restaurant Display ---
+        function displayRestaurants(filteredRestaurants) {
+            const container = document.getElementById("restaurant-sections-container");
+            container.innerHTML = ""; // Clear previous content
+
+            if (filteredRestaurants.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-500 mt-6">No restaurants match your criteria.</p>';
+                addMarkers([]); // Clear map markers
+                return;
+            }
+
+            // Group restaurants by category
+            const groupedByCategory = filteredRestaurants.reduce((acc, restaurant) => {
+                const category = restaurant.category || "Uncategorized"; // Handle missing category
+                if (!acc[category]) {
+                    acc[category] = [];
+                }
+                acc[category].push(restaurant);
+                return acc;
+            }, {});
+
+            // Get sorted category names
+            const sortedCategories = Object.keys(groupedByCategory).sort();
+
+            // Create sections for each category
+            sortedCategories.forEach(category => {
+                const section = document.createElement("section");
+                section.classList.add("restaurant-category-section");
+                section.setAttribute('data-category', category); // Add data attribute for potential future use
+
+                const title = document.createElement("h2");
+                title.classList.add("restaurant-category-title");
+                title.textContent = category;
+                section.appendChild(title);
+
+                const grid = document.createElement("div");
+                grid.classList.add("restaurant-grid"); // Use the grid class
+
+                // Create cards for restaurants in this category
+                groupedByCategory[category].forEach(restaurant => {
+                    const restaurantCard = createRestaurantCard(restaurant);
+                    grid.appendChild(restaurantCard);
+                });
+
+                section.appendChild(grid);
+                container.appendChild(section);
+            });
+
+             // Update map markers with the filtered list
+            addMarkers(filteredRestaurants);
+        }
+
+        // --- Create Single Restaurant Card ---
+        function createRestaurantCard(restaurant) {
+            const card = document.createElement("div");
+            card.classList.add("restaurant-item");
+
+            // Generate rating stars
+            const ratingStars = generateRatingStars(restaurant.rating);
+
+            // Generate Google Maps link
+            const mapLink = generateGoogleMapsLink(restaurant.name, restaurant.address);
+
+            card.innerHTML = `
+                <div> <h3 class="restaurant-name">${restaurant.name}</h3>
+                    <p class="restaurant-description">${restaurant.description || 'No description available.'}</p>
+                    <div class="restaurant-details">
+                        <strong>Type:</strong> ${restaurant.type || 'N/A'}
+                    </div>
+                    <div class="restaurant-details">
+                        <strong>Price:</strong> ${restaurant.priceRange || 'N/A'}
+                    </div>
+                    <div class="restaurant-details">
+                        <strong>Rating:</strong>
+                        <span class="rating-stars">${ratingStars}</span>
+                        <span class="ml-1">(${restaurant.rating ? restaurant.rating.toFixed(1) : 'N/A'})</span>
+                    </div>
+                    <div class="restaurant-details">
+                        <strong>Address:</strong> ${restaurant.address || 'N/A'}
+                    </div>
+                    ${restaurant.website ? `
+                        <div class="restaurant-details">
+                           <strong>Website:</strong> <a href="${restaurant.website}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 hover:underline">${getDomainName(restaurant.website)}</a>
+                        </div>
+                    ` : ''}
+                </div>
+                <div> ${mapLink ? `
+                        <a href="${mapLink}" target="_blank" rel="noopener noreferrer" class="map-link">
+                            <i class="lucide">&#xe9c3;</i> View on Map
+                        </a>
+                    ` : ''}
+                </div>
+            `;
+            return card;
+        }
+
+        // --- Helper Functions ---
+
+        // Generate Google Maps search link
+        function generateGoogleMapsLink(name, address) {
+            if (!name || !address) return null;
+            const query = encodeURIComponent(`${name}, ${address}`);
+            return `https://www.google.com/maps/search/?api=1&query=${query}`;
+        }
+
+         // Generate star icons based on rating
+        function generateRatingStars(rating) {
+            if (typeof rating !== 'number' || rating < 0) return 'N/A';
+            const fullStar = '<i class="lucide">&#xea73;</i>'; // star icon filled
+            const halfStar = '<i class="lucide">&#xea72;</i>'; // star-half icon
+            const emptyStar = '<i class="lucide">&#xea74;</i>'; // star icon empty
+            const maxStars = 5;
+            let starsHtml = '';
+            const roundedRating = Math.round(rating * 2) / 2; // Round to nearest 0.5
+
+            for (let i = 1; i <= maxStars; i++) {
+                if (i <= roundedRating) {
+                    starsHtml += fullStar;
+                } else if (i - 0.5 === roundedRating) {
+                    starsHtml += halfStar;
+                } else {
+                    starsHtml += emptyStar;
+                }
+            }
+            return starsHtml;
+        }
+
+        // Get domain name from URL
+         function getDomainName(url) {
+            if (!url) return '';
+            try {
+                const parsedUrl = new URL(url);
+                // Remove 'www.' if present
+                return parsedUrl.hostname.replace(/^www\./, '');
+            } catch (e) {
+                console.error("Invalid URL:", url, e);
+                return url; // Return original string if parsing fails
+            }
+        }
+
+
+        // Show a temporary message
+        function showMessage(message, duration = 3000) {
+            const messageBox = document.getElementById('message-box');
             messageBox.textContent = message;
-            messageBox.classList.add("show");
+            messageBox.classList.add('show');
+
+            // Hide the message after the duration
             setTimeout(() => {
-                messageBox.classList.remove("show");
-            }, 3000);
+                messageBox.classList.remove('show');
+            }, duration);
         }
 
-        document.getElementById("search-input").addEventListener("input", filterAndSortRestaurants);
-        document.getElementById("filter-type").addEventListener("change", filterAndSortRestaurants);
-        document.getElementById("sort-button").addEventListener("click", filterAndSortRestaurants);
+        // --- Filtering and Sorting Logic ---
+        function filterAndSortRestaurants() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const selectedCategory = document.getElementById('filter-category').value;
+            const selectedType = document.getElementById('filter-type').value;
+            const sortValue = document.getElementById('sort-options').value;
 
-        window.onload = () => {
-            initMap();
-            displayRestaurants(restaurants);
-        };
+            // 1. Filter
+            let filtered = restaurants.filter(r => {
+                const nameMatch = r.name.toLowerCase().includes(searchTerm);
+                const descriptionMatch = r.description.toLowerCase().includes(searchTerm);
+                const categoryMatch = !selectedCategory || r.category === selectedCategory;
+                const typeMatch = !selectedType || r.type === selectedType;
+
+                return (nameMatch || descriptionMatch) && categoryMatch && typeMatch;
+            });
+
+            // 2. Sort
+            switch (sortValue) {
+                case 'name_asc':
+                    filtered.sort((a, b) => a.name.localeCompare(b.name));
+                    break;
+                case 'name_desc':
+                    filtered.sort((a, b) => b.name.localeCompare(a.name));
+                    break;
+                case 'rating_asc':
+                    // Handle null/undefined ratings - sort them to the bottom
+                    filtered.sort((a, b) => (a.rating ?? -1) - (b.rating ?? -1));
+                    break;
+                case 'rating_desc':
+                     // Handle null/undefined ratings - sort them to the bottom
+                    filtered.sort((a, b) => (b.rating ?? -1) - (a.rating ?? -1));
+                    break;
+                case 'price_asc':
+                    // Sort by length of priceRange string (€ < €€ < €€€)
+                    filtered.sort((a, b) => (a.priceRange?.length ?? 0) - (b.priceRange?.length ?? 0));
+                    break;
+                case 'price_desc':
+                     // Sort by length of priceRange string (€€€ > €€ > €)
+                    filtered.sort((a, b) => (b.priceRange?.length ?? 0) - (a.priceRange?.length ?? 0));
+                    break;
+                case 'default':
+                default:
+                    // Keep original order (or sort by an implicit order if needed)
+                    // For now, rely on the order after filtering
+                    break;
+            }
+
+            // 3. Display
+            displayRestaurants(filtered);
+        }
+
+
+        // --- Populate Filter Dropdowns ---
+        function populateFilters() {
+            const categoryFilter = document.getElementById('filter-category');
+            const typeFilter = document.getElementById('filter-type');
+
+            // Get unique categories and types, handling potential null/undefined values
+            const categories = [...new Set(restaurants.map(r => r.category).filter(Boolean))].sort();
+            const types = [...new Set(restaurants.map(r => r.type).filter(Boolean))].sort();
+
+            // Populate Category Filter
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categoryFilter.appendChild(option);
+            });
+
+            // Populate Type Filter
+            types.forEach(type => {
+                const option = document.createElement('option');
+                option.value = type;
+                option.textContent = type;
+                typeFilter.appendChild(option);
+            });
+        }
+
+        // --- Event Listeners ---
+        function setupEventListeners() {
+            const searchInput = document.getElementById('search-input');
+            const categoryFilter = document.getElementById('filter-category');
+            const typeFilter = document.getElementById('filter-type');
+            const sortOptions = document.getElementById('sort-options');
+            // const applyButton = document.getElementById('apply-filters-button'); // If using apply button
+
+            // Filter/Sort on change
+            searchInput.addEventListener('input', filterAndSortRestaurants);
+            categoryFilter.addEventListener('change', filterAndSortRestaurants);
+            typeFilter.addEventListener('change', filterAndSortRestaurants);
+            sortOptions.addEventListener('change', filterAndSortRestaurants);
+
+            // If using an apply button:
+            // applyButton.addEventListener('click', filterAndSortRestaurants);
+        }
+
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                initMap();
+                populateFilters();
+                setupEventListeners();
+                displayRestaurants(restaurants); // Initial display of all restaurants
+            } catch (error) {
+                console.error("Error initializing the page:", error);
+                showMessage("Error loading restaurant data. Please try refreshing.", 5000);
+            }
+        });
+
     </script>
 </body>
 </html>
+
