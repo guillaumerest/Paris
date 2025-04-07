@@ -3,238 +3,258 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paris Restaurant Guide</title>
+    <title>Guillaume's Paris Restaurant Guide</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-      @font-face {
-        font-family: 'LucideIcons';
-        /* Updated CDN URL for better reliability */
-        src: url('https://cdn.jsdelivr.net/npm/lucide-static@latest/font/Lucide.ttf') format('truetype');
-      }
-      .lucide {
-        font-family: 'LucideIcons';
-        font-size: 1.25rem; /* Adjust size as needed */
-        line-height: 1;
-        display: inline-block;
-        vertical-align: middle;
-      }
-    </style>
-    <style>
-        /* Custom CSS */
+        /* Custom CSS Variables for Theming */
+        :root {
+            --bg-color: #f9fafb; /* gray-50 */
+            --card-bg: #ffffff; /* white */
+            --text-color-primary: #111827; /* gray-900 */
+            --text-color-secondary: #4b5563; /* gray-600 */
+            --text-color-muted: #6b7280; /* gray-500 */
+            --text-color-heading: #1f2937; /* gray-800 */
+            --border-color: #e5e7eb; /* gray-200 */
+            --input-bg: #ffffff; /* white */
+            --input-border: #d1d5db; /* gray-300 */
+            --input-text: #111827; /* gray-900 */
+            --input-placeholder: #9ca3af; /* gray-400 */
+            --shadow-color-light: rgba(0, 0, 0, 0.05);
+            --shadow-color-hover-light: rgba(0, 0, 0, 0.1);
+            --link-color: #3b82f6; /* blue-500 */
+            --link-hover-color: #2563eb; /* blue-600 */
+            --button-bg: #4f46e5; /* indigo-600 */
+            --button-hover-bg: #4338ca; /* indigo-700 */
+            --map-filter: none; /* No filter for light map */
+        }
+
+        html.dark-mode { /* Apply dark mode variables to html tag */
+            --bg-color: #111827; /* gray-900 */
+            --card-bg: #1f2937; /* gray-800 */
+            --text-color-primary: #f3f4f6; /* gray-100 */
+            --text-color-secondary: #9ca3af; /* gray-400 */
+            --text-color-muted: #6b7280; /* gray-500 */
+            --text-color-heading: #e5e7eb; /* gray-200 */
+            --border-color: #374151; /* gray-700 */
+            --input-bg: #374151; /* gray-700 */
+            --input-border: #4b5563; /* gray-600 */
+            --input-text: #f3f4f6; /* gray-100 */
+            --input-placeholder: #6b7280; /* gray-500 */
+            --shadow-color-light: rgba(0, 0, 0, 0.2);
+            --shadow-color-hover-light: rgba(0, 0, 0, 0.3);
+            --link-color: #60a5fa; /* blue-400 */
+            --link-hover-color: #93c5fd; /* blue-300 */
+            --button-bg: #6366f1; /* indigo-500 */
+            --button-hover-bg: #4f46e5; /* indigo-600 */
+            --map-filter: brightness(0.7) contrast(1.1) grayscale(0.1); /* Filter for dark map */
+        }
+
+        /* General HTML/Body Styles */
+        html {
+            background-color: var(--bg-color); /* Apply background to html */
+            transition: background-color 0.3s ease;
+            height: 100%; /* Ensure html takes full height */
+        }
         body {
             font-family: 'Inter', sans-serif;
+            color: var(--text-color-secondary); /* Default text color */
+            min-height: 100%; /* Ensure body takes full height */
+            transition: color 0.3s ease;
         }
 
-        /* Style for the message box */
+        /* Headings */
+        h1, h2, h3 {
+            color: var(--text-color-heading);
+            transition: color 0.3s ease; /* Add transition */
+        }
+        /* Ensure header text colors update */
+        html.dark-mode header h1 {
+             color: var(--text-color-heading);
+        }
+        html.dark-mode header p {
+            color: var(--text-color-secondary);
+        }
+
+
+        /* Links */
+        a {
+            color: var(--link-color);
+            transition: color 0.2s ease;
+        }
+        a:hover {
+            color: var(--link-hover-color);
+        }
+
+        /* Inputs and Selects */
+        input[type="text"], select {
+            background-color: var(--input-bg);
+            border-color: var(--input-border);
+            color: var(--input-text);
+            border-radius: 0.5rem; /* rounded-lg */
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+        }
+        input[type="text"]::placeholder {
+            color: var(--input-placeholder);
+        }
+        select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        }
+        html.dark-mode select { /* Update selector */
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        }
+
+
+        /* Message Box */
         #message-box {
-            display: none; /* Hidden by default */
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #f0fdf4; /* Light green background */
-            color: #15803d; /* Dark green text */
-            padding: 16px;
-            border-radius: 8px; /* Rounded corners */
-            border: 1px solid #16a34a; /* Green border */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-            z-index: 1000; /* Ensure it's on top */
-            opacity: 0; /* Start invisible for transition */
-            transition: opacity 0.3s ease-in-out;
+            display: none; position: fixed; top: 20px; left: 50%;
+            transform: translateX(-50%); background-color: #dcfce7;
+            color: #166534; padding: 1rem; border-radius: 0.5rem;
+            border: 1px solid #86efac; box-shadow: 0 4px 6px var(--shadow-color-light);
+            z-index: 1000; opacity: 0; transition: opacity 0.3s ease-in-out;
         }
-
-        #message-box.show {
-            display: block; /* Make it visible */
-            opacity: 1; /* Fade in */
+        html.dark-mode #message-box { /* Update selector */
+             background-color: #14532d; color: #bbf7d0; border-color: #166534;
         }
+        #message-box.show { display: block; opacity: 1; }
 
-        /* Styling for restaurant category sections */
-        .restaurant-category-section {
-            margin-bottom: 2.5rem; /* Increased bottom margin */
-            padding-top: 1.5rem; /* Add padding top for spacing */
-        }
-
+        /* Category Section Title */
         .restaurant-category-title {
-            font-size: 1.75rem; /* Larger font size */
-            font-weight: 600; /* Semi-bold */
-            color: #1f2937; /* Darker gray text */
-            margin-bottom: 1.5rem; /* Increased margin below title */
-            text-align: left; /* Align title to the left */
-            border-bottom: 2px solid #e5e7eb; /* Lighter border */
-            padding-bottom: 0.75rem; /* Padding below text */
+            color: var(--text-color-heading);
+            border-bottom-color: var(--border-color);
+            transition: color 0.3s ease, border-color 0.3s ease; /* Add transition */
         }
 
-        /* Styling for individual restaurant cards */
+        /* Restaurant Card */
         .restaurant-item {
-            background-color: white;
-            border-radius: 12px; /* Slightly more rounded corners */
-            padding: 1.5rem; /* Increased padding */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); /* Softer shadow */
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100%; /* Ensure cards in a row have same height */
-            border: 1px solid #e5e7eb; /* Subtle border */
+            background-color: var(--card-bg); border-color: var(--border-color);
+            box-shadow: 0 4px 8px var(--shadow-color-light);
+            transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         }
-
         .restaurant-item:hover {
-            transform: translateY(-4px); /* Slightly less lift */
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Slightly stronger shadow on hover */
+            box-shadow: 0 6px 12px var(--shadow-color-hover-light); transform: translateY(-4px);
+        }
+        .restaurant-name { color: var(--text-color-heading); }
+        .restaurant-description { color: var(--text-color-secondary); }
+        .restaurant-details { color: var(--text-color-muted); }
+        .restaurant-details strong { color: var(--text-color-secondary); font-weight: 500; }
+        /* Add transitions for text colors inside card */
+        html.dark-mode .restaurant-item .restaurant-name,
+        html.dark-mode .restaurant-item .restaurant-description,
+        html.dark-mode .restaurant-item .restaurant-details,
+        html.dark-mode .restaurant-item .restaurant-details strong {
+             transition: color 0.3s ease;
         }
 
-        .restaurant-name {
-            font-size: 1.25rem; /* Larger name */
-            font-weight: 600;
-            color: #111827; /* Even darker gray for name */
-            margin-bottom: 0.75rem;
-        }
 
-        .restaurant-description {
-            font-size: 0.95rem; /* Slightly smaller description */
-            color: #4b5563; /* Medium gray for description */
-            margin-bottom: 1rem;
-            flex-grow: 1; /* Allow description to take available space */
-        }
+        /* Rating Stars */
+        .rating-stars { color: #f59e0b; display: inline-block; }
+        .rating-stars i { font-size: 1em; vertical-align: baseline; }
 
-        .restaurant-details {
-            font-size: 0.9rem;
-            color: #6b7280; /* Lighter gray for details */
-            margin-bottom: 0.5rem;
-        }
-
-        .restaurant-details strong {
-            color: #374151; /* Darker gray for labels */
-            font-weight: 500;
-        }
-
-        /* Rating display */
-        .rating-stars {
-            color: #f59e0b; /* Amber color for stars */
-            display: inline-block;
-        }
-
-        /* Map link button */
+        /* Map Link Button */
         .map-link {
-            display: inline-flex; /* Use inline-flex for icon alignment */
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem; /* Space between icon and text */
-            color: white;
-            background-color: #3b82f6; /* Tailwind blue-500 */
-            padding: 0.6rem 1rem; /* Adjusted padding */
-            border-radius: 8px;
-            text-decoration: none;
-            text-align: center;
-            margin-top: 1rem;
-            transition: background-color 0.2s ease;
-            font-weight: 500; /* Medium weight */
-            border: none;
-            cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 0.5rem; color: white; background-color: var(--link-color);
+            padding: 0.6rem 1rem; border-radius: 0.5rem; text-decoration: none;
+            text-align: center; margin-top: 1rem; transition: background-color 0.2s ease;
+            font-weight: 500; border: none; cursor: pointer;
         }
+        .map-link:hover { background-color: var(--link-hover-color); }
+        .map-link i { font-size: 1em; }
 
-        .map-link:hover {
-            background-color: #2563eb; /* Tailwind blue-600 */
-        }
-
-        /* Ensure map resizes properly */
+        /* Map Styles */
         #map {
-            height: 450px; /* Slightly taller map */
-            border-radius: 12px; /* Match card rounding */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e5e7eb;
-            margin-bottom: 2rem;
+            height: 450px; border-radius: 0.75rem;
+            box-shadow: 0 4px 8px var(--shadow-color-light);
+            border: 1px solid var(--border-color); margin-bottom: 2rem;
+            background-color: #e2e8f0;
+            transition: border-color 0.3s ease, background-color 0.3s ease;
+        }
+         html.dark-mode #map { /* Update selector */
+             background-color: #374151;
+         }
+        /* Apply filter to map tiles in dark mode */
+        html.dark-mode .leaflet-tile-container img { /* Update selector */
+            filter: var(--map-filter);
         }
 
-        /* Responsive grid */
-        #restaurant-sections-container {
-            width: 100%;
-        }
-
-        .restaurant-grid {
-            display: grid;
-            grid-template-columns: 1fr; /* 1 column by default */
-            gap: 1.5rem; /* Consistent gap */
-        }
-
-        @media (min-width: 768px) { /* Medium screens */
-            .restaurant-grid {
-                grid-template-columns: repeat(2, 1fr); /* 2 columns */
-            }
-        }
-
-        @media (min-width: 1024px) { /* Large screens */
-            .restaurant-grid {
-                grid-template-columns: repeat(3, 1fr); /* 3 columns */
-            }
-        }
-
-        /* Add some padding to the filter/search section */
+        /* Search/Filter Bar */
         #search-filter {
-            background-color: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e5e7eb;
-            margin-bottom: 2rem;
+            background-color: var(--card-bg); padding: 1.5rem;
+            border-radius: 0.75rem; box-shadow: 0 2px 4px var(--shadow-color-light);
+            border: 1px solid var(--border-color); margin-bottom: 2rem;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
         }
 
-        /* Leaflet Icon Customization - Ensure popup is above icon */
-        .leaflet-popup-content-wrapper {
-            border-radius: 8px;
-        }
-        .leaflet-popup-content {
-            margin: 10px;
+        /* Night Mode Toggle Button */
+        #night-mode-toggle {
+            background-color: var(--input-bg); color: var(--text-color-secondary);
+            border: 1px solid var(--border-color); padding: 0.5rem 1rem;
+            border-radius: 0.5rem; cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+            display: inline-flex; align-items: center; gap: 0.5rem;
             font-size: 0.9rem;
-            line-height: 1.4;
         }
+        #night-mode-toggle:hover { background-color: var(--bg-color); }
+        #night-mode-toggle i { font-size: 1.1em; color: #f59e0b; }
+        html.dark-mode #night-mode-toggle i { color: #facc15; } /* Update selector */
+
+        /* Leaflet Popup */
+        .leaflet-popup-content-wrapper {
+            border-radius: 0.5rem; background-color: var(--card-bg);
+            color: var(--text-color-primary);
+            transition: background-color 0.3s ease, color 0.3s ease; /* Add transition */
+        }
+         .leaflet-popup-tip {
+             background-color: var(--card-bg);
+             transition: background-color 0.3s ease; /* Add transition */
+         }
+        .leaflet-popup-content { margin: 0.8rem; font-size: 0.9rem; line-height: 1.4; }
+        .leaflet-popup-content a { color: var(--link-color); }
+        .leaflet-popup-content a:hover { color: var(--link-hover-color); }
+
+        /* Responsive Grid */
+        .restaurant-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+        @media (min-width: 768px) { .restaurant-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 1024px) { .restaurant-grid { grid-template-columns: repeat(3, 1fr); } }
     </style>
     <script>
-        // Tailwind Configuration (optional, if needed for specifics)
+        // Tailwind Configuration
         tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        'inter': ['Inter', 'sans-serif'],
-                    },
-                },
-            },
+            darkMode: 'class',
+            theme: { extend: { fontFamily: { 'inter': ['Inter', 'sans-serif'] } } }
         }
     </script>
 </head>
-<body class="bg-gray-50 font-inter">
-    <div class="container mx-auto p-4 md:p-8">
-        <header class="text-center mb-10">
-            <h1 class="text-4xl font-bold text-gray-800 mb-2">Paris Restaurant Guide</h1>
-            <p class="text-lg text-gray-600">Update 2025</p>
+<body> <div class="container mx-auto p-4 md:p-8">
+        <header class="relative text-center mb-10 pt-4">
+            <h1 class="text-4xl font-bold mb-2">Guillaume's Paris Restaurant Guide</h1>
+            <p class="text-lg">Your curated list of Parisian culinary delights</p>
+            <div class="absolute top-0 right-0 mt-0 mr-0">
+                 <button id="night-mode-toggle" aria-label="Toggle dark mode">
+                     </button>
+            </div>
         </header>
 
         <div id="search-filter" class="flex flex-col md:flex-row gap-4 mb-8 items-center">
             <div class="relative flex-grow w-full md:w-auto">
                  <span class="absolute inset-y-0 left-0 flex items-center pl-3">
-                    <i class="lucide text-gray-400"></i> </span>
-                 <input
-                    type="text"
-                    id="search-input"
-                    placeholder="Search by name or description..."
-                    class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none"
-                 />
+                    <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
+                 </span>
+                 <input type="text" id="search-input" placeholder="Search by name or description..." class="w-full pl-10 pr-4 py-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none"/>
             </div>
-
-            <select id="filter-category" class="w-full md:w-auto px-4 py-2 rounded-lg border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none bg-white">
+            <select id="filter-category" class="w-full md:w-auto px-4 py-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none">
                 <option value="">All Categories</option>
-                </select>
-
-            <select id="filter-type" class="w-full md:w-auto px-4 py-2 rounded-lg border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none bg-white">
+            </select>
+            <select id="filter-type" class="w-full md:w-auto px-4 py-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none">
                 <option value="">All Types</option>
-                </select>
-
-            <select id="sort-options" class="w-full md:w-auto px-4 py-2 rounded-lg border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none bg-white">
+            </select>
+            <select id="sort-options" class="w-full md:w-auto px-4 py-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none">
                 <option value="default">Default Order</option>
                 <option value="name_asc">Name (A-Z)</option>
                 <option value="name_desc">Name (Z-A)</option>
@@ -243,325 +263,233 @@
                 <option value="price_asc">Price (Low-High)</option>
                 <option value="price_desc">Price (High-Low)</option>
             </select>
-            </div>
+        </div>
 
         <div id="message-box"></div>
-
         <div id="map"></div>
-
-        <div id="restaurant-sections-container">
-            </div>
-
+        <div id="restaurant-sections-container"></div>
     </div>
 
     <script>
         // --- Data ---
         const restaurants = [
+             // (Restaurant data remains the same as previous version)
              // --- Traditional & Classic French Dining ---
             { name: "Le Bouillon Chartier", category: "Traditional & Classic French Dining", description: "Traditional French Brasserie in the 9th Arrondissement, famed for its Belle Époque décor, bustling atmosphere, classic dishes, and extremely low prices.", type: "French Brasserie", address: "7 Rue du Faubourg Montmartre, 75009 Paris", rating: 4.0, priceRange: "€", latitude: 48.8722, longitude: 2.3444, website: "https://www.bouillon-chartier.com/en/" },
             { name: "Le Consulat", category: "Traditional & Classic French Dining", description: "A classic French café/brasserie in Montmartre (18th Arrondissement) known for its picturesque façade and deep historical charm.", type: "French Cafe/Brasserie", address: "18 Rue Norvins, 75018 Paris", rating: 3.8, priceRange: "€€", latitude: 48.8867, longitude: 2.3399, website: null },
             { name: "La Maison Rose", category: "Traditional & Classic French Dining", description: "Historic restaurant & café in Montmartre (18th Arrondissement) celebrated for its iconic pink building, artistically inspired history, and seasonal French/Italian fare.", type: "French/Italian", address: "2 Rue de l'Abreuvoir, 75018 Paris", rating: 4.1, priceRange: "€€", latitude: 48.8875, longitude: 2.3393, website: "https://lamaisonrose-montmartre.com/en" },
-            { name: "Le Coq & Fils", category: "Traditional & Classic French Dining", description: "Upscale poultry‑focused bistro in Montmartre (18th Arrondissement) that highlights exceptional poultry breeds and roast preparations.", type: "French Bistro (Poultry)", address: "98 Rue Lepic, 75018 Paris", rating: 4.5, priceRange: "€€€", latitude: 48.8871, longitude: 2.3376, website: "https://lecoqetfils.com/en/" }, // Updated address and rating
-            { name: "Jouvence", category: "Traditional & Classic French Dining", description: "A modern bistro and wine bar in the 12th Arrondissement known for its seasonal market cuisine and excellent natural wine selection in a cozy setting.", type: "French Bistro/Wine Bar", address: "17 Rue Chanzy, 75011 Paris", rating: 4.6, priceRange: "€€", latitude: 48.8533, longitude: 2.3836, website: "https://www.jouvence.paris/" }, // Updated address and rating
-            { name: "Chez Georges", category: "Traditional & Classic French Dining", description: "A classic Parisian bistro near Place des Victoires in the 2nd Arrondissement, keeping its traditional décor and serving dishes like sole meunière and steak frites.", type: "French Bistro", address: "1 Rue du Mail, 75002 Paris", rating: 4.4, priceRange: "€€€", latitude: 48.8675, longitude: 2.3409, website: null }, // Updated rating
-            { name: "Le Bon Georges", category: "Traditional & Classic French Dining", description: "A high‑quality bistro in the Saint‑Georges area of the 9th Arrondissement, renowned for top-sourced ingredients and a refined wine list.", type: "French Bistro", address: "45 Rue Saint-Georges, 75009 Paris", rating: 4.6, priceRange: "€€€", latitude: 48.8774, longitude: 2.3385, website: "https://www.lebongeorges.com/en" }, // Updated rating
-            { name: "Gallopin", category: "Traditional & Classic French Dining", description: "Grand historic brasserie in the Bourse area (2nd Arrondissement) with Belle Époque décor and a glass‑roofed garden room.", type: "French Brasserie", address: "40 Rue Notre Dame des Victoires, 75002 Paris", rating: 4.2, priceRange: "€€€", latitude: 48.8687, longitude: 2.3428, website: "https://www.gallopin.com/en/" }, // Updated rating
-            { name: "Ose", category: "Traditional & Classic French Dining", description: "A modern neighborhood restaurant in Abbesses (Montmartre) offering creative small plates with a modern twist.", type: "Modern French", address: "4 Rue Burq, 75018 Paris", rating: 4.7, priceRange: "€€", latitude: 48.8853, longitude: 2.3371, website: "https://www.ose-paris.com/" }, // Updated address and rating
-            { name: "La Mascotte Montmartre", category: "Traditional & Classic French Dining", description: "Historic seafood brasserie in Montmartre known for oysters and an Art Deco interior.", type: "French Seafood Brasserie", address: "52 Rue des Abbesses, 75018 Paris", rating: 4.3, priceRange: "€€€", latitude: 48.8850, longitude: 2.3367, website: "https://www.la-mascotte-montmartre.com/en" }, // Updated rating
-            { name: "La Marine", category: "Traditional & Classic French Dining", description: "Bistro along Canal Saint‑Martin offering classic French fare and great terrace seating.", type: "French Bistro", address: "55 bis Quai de Valmy, 75010 Paris", rating: 4.0, priceRange: "€€", latitude: 48.8718, longitude: 2.3649, website: null }, // Updated address
+            { name: "Le Coq & Fils", category: "Traditional & Classic French Dining", description: "Upscale poultry‑focused bistro in Montmartre (18th Arrondissement) that highlights exceptional poultry breeds and roast preparations.", type: "French Bistro (Poultry)", address: "98 Rue Lepic, 75018 Paris", rating: 4.5, priceRange: "€€€", latitude: 48.8871, longitude: 2.3376, website: "https://lecoqetfils.com/en/" },
+            { name: "Jouvence", category: "Traditional & Classic French Dining", description: "A modern bistro and wine bar in the 12th Arrondissement known for its seasonal market cuisine and excellent natural wine selection in a cozy setting.", type: "French Bistro/Wine Bar", address: "17 Rue Chanzy, 75011 Paris", rating: 4.6, priceRange: "€€", latitude: 48.8533, longitude: 2.3836, website: "https://www.jouvence.paris/" },
+            { name: "Chez Georges", category: "Traditional & Classic French Dining", description: "A classic Parisian bistro near Place des Victoires in the 2nd Arrondissement, keeping its traditional décor and serving dishes like sole meunière and steak frites.", type: "French Bistro", address: "1 Rue du Mail, 75002 Paris", rating: 4.4, priceRange: "€€€", latitude: 48.8675, longitude: 2.3409, website: null },
+            { name: "Le Bon Georges", category: "Traditional & Classic French Dining", description: "A high‑quality bistro in the Saint‑Georges area of the 9th Arrondissement, renowned for top-sourced ingredients and a refined wine list.", type: "French Bistro", address: "45 Rue Saint-Georges, 75009 Paris", rating: 4.6, priceRange: "€€€", latitude: 48.8774, longitude: 2.3385, website: "https://www.lebongeorges.com/en" },
+            { name: "Gallopin", category: "Traditional & Classic French Dining", description: "Grand historic brasserie in the Bourse area (2nd Arrondissement) with Belle Époque décor and a glass‑roofed garden room.", type: "French Brasserie", address: "40 Rue Notre Dame des Victoires, 75002 Paris", rating: 4.2, priceRange: "€€€", latitude: 48.8687, longitude: 2.3428, website: "https://www.gallopin.com/en/" },
+            { name: "Ose", category: "Traditional & Classic French Dining", description: "A modern neighborhood restaurant in Abbesses (Montmartre) offering creative small plates with a modern twist.", type: "Modern French", address: "4 Rue Burq, 75018 Paris", rating: 4.7, priceRange: "€€", latitude: 48.8853, longitude: 2.3371, website: "https://www.ose-paris.com/" },
+            { name: "La Mascotte Montmartre", category: "Traditional & Classic French Dining", description: "Historic seafood brasserie in Montmartre known for oysters and an Art Deco interior.", type: "French Seafood Brasserie", address: "52 Rue des Abbesses, 75018 Paris", rating: 4.3, priceRange: "€€€", latitude: 48.8850, longitude: 2.3367, website: "https://www.la-mascotte-montmartre.com/en" },
+            { name: "La Marine", category: "Traditional & Classic French Dining", description: "Bistro along Canal Saint‑Martin offering classic French fare and great terrace seating.", type: "French Bistro", address: "55 bis Quai de Valmy, 75010 Paris", rating: 4.0, priceRange: "€€", latitude: 48.8718, longitude: 2.3649, website: null },
 
             // --- Modern & Innovative French Dining ---
-            { name: "Bistrotters", category: "Modern & Innovative French Dining", description: "Modern bistro in the 14th Arrondissement offering creative tasting menus and excellent value.", type: "Modern French Bistro", address: "9 Rue Decrès, 75014 Paris", rating: 4.8, priceRange: "€€", latitude: 48.8336, longitude: 2.3173, website: "https://www.bistrotters.com/" }, // Updated rating
-            { name: "Aux Plumes", category: "Modern & Innovative French Dining", description: "Intimate modern dining with Spanish-influenced creative tasting menus in the 14th Arrondissement.", type: "Modern French/Spanish", address: "45 Rue Boulard, 75014 Paris", rating: 4.7, priceRange: "€€€", latitude: 48.8332, longitude: 2.3282, website: "https://www.auxplumesparis.com/" }, // Updated address and rating
-            { name: "Tadam", category: "Modern & Innovative French Dining", description: "Inventive, market-driven cuisine and natural wines in the 12th Arrondissement.", type: "Modern French/Natural Wine", address: "152 Rue du Faubourg Saint-Antoine, 75012 Paris", rating: 4.5, priceRange: "€€", latitude: 48.8492, longitude: 2.3805, website: null }, // Updated address
+            { name: "Bistrotters", category: "Modern & Innovative French Dining", description: "Modern bistro in the 14th Arrondissement offering creative tasting menus and excellent value.", type: "Modern French Bistro", address: "9 Rue Decrès, 75014 Paris", rating: 4.8, priceRange: "€€", latitude: 48.8336, longitude: 2.3173, website: "https://www.bistrotters.com/" },
+            { name: "Aux Plumes", category: "Modern & Innovative French Dining", description: "Intimate modern dining with Spanish-influenced creative tasting menus in the 14th Arrondissement.", type: "Modern French/Spanish", address: "45 Rue Boulard, 75014 Paris", rating: 4.7, priceRange: "€€€", latitude: 48.8332, longitude: 2.3282, website: "https://www.auxplumesparis.com/" },
+            { name: "Tadam", category: "Modern & Innovative French Dining", description: "Inventive, market-driven cuisine and natural wines in the 12th Arrondissement.", type: "Modern French/Natural Wine", address: "152 Rue du Faubourg Saint-Antoine, 75012 Paris", rating: 4.5, priceRange: "€€", latitude: 48.8492, longitude: 2.3805, website: null },
 
             // --- World Cuisine & Fusion ---
-            { name: "Kokoro", category: "World Cuisine & Fusion", description: "Refined French-Japanese fusion cuisine in the Latin Quarter (5th Arrondissement).", type: "French-Japanese Fusion", address: "36 Rue des Boulangers, 75005 Paris", rating: 4.7, priceRange: "€€€", latitude: 48.8468, longitude: 2.3527, website: "https://www.kokoroparis.com/" }, // Updated rating
-            { name: "Jinchan Shokudo", category: "World Cuisine & Fusion", description: "Casual Japanese canteen near Palais Royal (1st Arrondissement) with specialties in curry and udon.", type: "Japanese Canteen", address: "15 Rue des Petits Champs, 75001 Paris", rating: 4.4, priceRange: "€", latitude: 48.8665, longitude: 2.3380, website: null }, // Updated address and rating
-            { name: "Abri Soba", category: "World Cuisine & Fusion", description: "Specialist in house-made soba noodles and tempura in the 9th Arrondissement.", type: "Japanese Soba", address: "10 Rue Saulnier, 75009 Paris", rating: 4.5, priceRange: "€€", latitude: 48.8740, longitude: 2.3453, website: null }, // Updated rating
+            { name: "Kokoro", category: "World Cuisine & Fusion", description: "Refined French-Japanese fusion cuisine in the Latin Quarter (5th Arrondissement).", type: "French-Japanese Fusion", address: "36 Rue des Boulangers, 75005 Paris", rating: 4.7, priceRange: "€€€", latitude: 48.8468, longitude: 2.3527, website: "https://www.kokoroparis.com/" },
+            { name: "Jinchan Shokudo", category: "World Cuisine & Fusion", description: "Casual Japanese canteen near Palais Royal (1st Arrondissement) with specialties in curry and udon.", type: "Japanese Canteen", address: "15 Rue des Petits Champs, 75001 Paris", rating: 4.4, priceRange: "€", latitude: 48.8665, longitude: 2.3380, website: null },
+            { name: "Abri Soba", category: "World Cuisine & Fusion", description: "Specialist in house-made soba noodles and tempura in the 9th Arrondissement.", type: "Japanese Soba", address: "10 Rue Saulnier, 75009 Paris", rating: 4.5, priceRange: "€€", latitude: 48.8740, longitude: 2.3453, website: null },
 
             // --- Rooftops, Terraces & Festive Dining ---
-            { name: "La Perruche", category: "Rooftops, Terraces & Festive Dining", description: "Rooftop restaurant atop Printemps Haussmann offering Mediterranean dishes and chic vibes.", type: "Mediterranean Rooftop", address: "Printemps de l'Homme, 2 Rue du Havre, 9ème étage, 75009 Paris", rating: 4.0, priceRange: "€€€€", latitude: 48.8738, longitude: 2.3289, website: "https://perruche-paris.com/en/" }, // Updated address and rating
-            { name: "Les Ombres", category: "Rooftops, Terraces & Festive Dining", description: "Fine dining with Eiffel Tower views at Musée du Quai Branly.", type: "Modern French (Fine Dining)", address: "27 Quai Jacques Chirac, 75007 Paris", rating: 4.3, priceRange: "€€€€", latitude: 48.8608, longitude: 2.2976, website: "https://www.lesombres-restaurant.com/en/" }, // Updated address and rating
-            { name: "L'Oiseau Blanc", category: "Rooftops, Terraces & Festive Dining", description: "Michelin-starred rooftop restaurant at The Peninsula Paris with aviation-themed décor and Eiffel Tower views.", type: "French (Fine Dining, Michelin *)", address: "The Peninsula Paris, 19 Avenue Kléber, 75116 Paris", rating: 4.6, priceRange: "€€€€", latitude: 48.8713, longitude: 2.2936, website: "https://www.peninsula.com/en/paris/hotel-fine-dining/loiseau-blanc-rooftop-restaurant" }, // Updated rating
-            { name: "Hollywood Savoy", category: "Rooftops, Terraces & Festive Dining", description: "Festive Italian-leaning brasserie in the Bourse area known for its party atmosphere.", type: "Italian Brasserie", address: "44 Rue Notre Dame des Victoires, 75002 Paris", rating: 4.1, priceRange: "€€€", latitude: 48.8687, longitude: 2.3432, website: "https://www.hollywoodsavoy.com/" }, // Updated address and rating
-            { name: "Les Jardins du Presbourg", category: "Rooftops, Terraces & Festive Dining", description: "Chic terrace bar and restaurant near Arc de Triomphe with trendy all-day dining.", type: "Modern French/International", address: "3 Avenue de la Grande Armée, 75116 Paris", rating: 4.2, priceRange: "€€€", latitude: 48.8740, longitude: 2.2927, website: "https://www.beaumarly.com/en/les-jardins-du-presbourg/" }, // Updated address and rating
-            { name: "Le Comptoir Général", category: "Rooftops, Terraces & Festive Dining", description: "Quirky bar and restaurant on Canal Saint‑Martin with eclectic décor and brunch scene.", type: "Bar/Restaurant (Eclectic)", address: "80 Quai de Jemmapes, 75010 Paris", rating: 4.1, priceRange: "€€", latitude: 48.8728, longitude: 2.3655, website: "https://www.lecomptoirgeneral.com/" }, // Updated rating
-            { name: "Rosa Bonheur (Buttes Chaumont)", category: "Rooftops, Terraces & Festive Dining", description: "Guinguette-style bar and café in Parc des Buttes-Chaumont known for dancing and sunshine.", type: "Bar/Café (Guinguette)", address: "Parc des Buttes Chaumont, 2 Avenue de la Cascade, 75019 Paris", rating: 4.0, priceRange: "€", latitude: 48.8799, longitude: 2.3818, website: "https://www.rosabonheur.fr/rosa-buttes" }, // Updated address and rating
-            { name: "Le Perchoir Ménilmontant", category: "Rooftops, Terraces & Festive Dining", description: "Trendy rooftop with city views, cocktails, and a young Parisian crowd in the 11th.", type: "Rooftop Bar/Restaurant", address: "14 Rue Crespin du Gast, 75011 Paris", rating: 4.0, priceRange: "€€€", latitude: 48.8641, longitude: 2.3806, website: "https://leperchoir.fr/location/le-perchoir-menilmontant/" }, // Updated rating
+            { name: "La Perruche", category: "Rooftops, Terraces & Festive Dining", description: "Rooftop restaurant atop Printemps Haussmann offering Mediterranean dishes and chic vibes.", type: "Mediterranean Rooftop", address: "Printemps de l'Homme, 2 Rue du Havre, 9ème étage, 75009 Paris", rating: 4.0, priceRange: "€€€€", latitude: 48.8738, longitude: 2.3289, website: "https://perruche-paris.com/en/" },
+            { name: "Les Ombres", category: "Rooftops, Terraces & Festive Dining", description: "Fine dining with Eiffel Tower views at Musée du Quai Branly.", type: "Modern French (Fine Dining)", address: "27 Quai Jacques Chirac, 75007 Paris", rating: 4.3, priceRange: "€€€€", latitude: 48.8608, longitude: 2.2976, website: "https://www.lesombres-restaurant.com/en/" },
+            { name: "L'Oiseau Blanc", category: "Rooftops, Terraces & Festive Dining", description: "Michelin-starred rooftop restaurant at The Peninsula Paris with aviation-themed décor and Eiffel Tower views.", type: "French (Fine Dining, Michelin *)", address: "The Peninsula Paris, 19 Avenue Kléber, 75116 Paris", rating: 4.6, priceRange: "€€€€", latitude: 48.8713, longitude: 2.2936, website: "https://www.peninsula.com/en/paris/hotel-fine-dining/loiseau-blanc-rooftop-restaurant" },
+            { name: "Hollywood Savoy", category: "Rooftops, Terraces & Festive Dining", description: "Festive Italian-leaning brasserie in the Bourse area known for its party atmosphere.", type: "Italian Brasserie", address: "44 Rue Notre Dame des Victoires, 75002 Paris", rating: 4.1, priceRange: "€€€", latitude: 48.8687, longitude: 2.3432, website: "https://www.hollywoodsavoy.com/" },
+            { name: "Les Jardins du Presbourg", category: "Rooftops, Terraces & Festive Dining", description: "Chic terrace bar and restaurant near Arc de Triomphe with trendy all-day dining.", type: "Modern French/International", address: "3 Avenue de la Grande Armée, 75116 Paris", rating: 4.2, priceRange: "€€€", latitude: 48.8740, longitude: 2.2927, website: "https://www.beaumarly.com/en/les-jardins-du-presbourg/" },
+            { name: "Le Comptoir Général", category: "Rooftops, Terraces & Festive Dining", description: "Quirky bar and restaurant on Canal Saint‑Martin with eclectic décor and brunch scene.", type: "Bar/Restaurant (Eclectic)", address: "80 Quai de Jemmapes, 75010 Paris", rating: 4.1, priceRange: "€€", latitude: 48.8728, longitude: 2.3655, website: "https://www.lecomptoirgeneral.com/" },
+            { name: "Rosa Bonheur (Buttes Chaumont)", category: "Rooftops, Terraces & Festive Dining", description: "Guinguette-style bar and café in Parc des Buttes-Chaumont known for dancing and sunshine.", type: "Bar/Café (Guinguette)", address: "Parc des Buttes Chaumont, 2 Avenue de la Cascade, 75019 Paris", rating: 4.0, priceRange: "€", latitude: 48.8799, longitude: 2.3818, website: "https://www.rosabonheur.fr/rosa-buttes" },
+            { name: "Le Perchoir Ménilmontant", category: "Rooftops, Terraces & Festive Dining", description: "Trendy rooftop with city views, cocktails, and a young Parisian crowd in the 11th.", type: "Rooftop Bar/Restaurant", address: "14 Rue Crespin du Gast, 75011 Paris", rating: 4.0, priceRange: "€€€", latitude: 48.8641, longitude: 2.3806, website: "https://leperchoir.fr/location/le-perchoir-menilmontant/" },
 
              // --- Bars & Nightlife ---
-            { name: "Classique", category: "Bars & Nightlife", description: "Café by day, cocktail lounge by night with a lovely terrace in the 9th.", type: "Cocktail Bar/Café", address: "1 bis Rue Lallier, 75009 Paris", rating: 4.5, priceRange: "€€", latitude: 48.8817, longitude: 2.3415, website: "https://classique-paris.com/" }, // Updated address and rating
-            { name: "Combat", category: "Bars & Nightlife", description: "Craft cocktail bar with a female-led team in Belleville.", type: "Cocktail Bar", address: "63 Rue de Belleville, 75019 Paris", rating: 4.6, priceRange: "€€", latitude: 48.8737, longitude: 2.3825, website: "https://combatbelleville.com/" }, // Updated rating
-            { name: "Castor Club", category: "Bars & Nightlife", description: "Cozy “log cabin” cocktail bar in Saint-Germain-des-Prés.", type: "Cocktail Bar", address: "14 Rue Hautefeuille, 75006 Paris", rating: 4.5, priceRange: "€€", latitude: 48.8526, longitude: 2.3413, website: null }, // Updated address
-            { name: "Brigitte", category: "Bars & Nightlife", description: "Laid-back cocktail spot in the Oberkampf area with consistently good drinks.", type: "Cocktail Bar", address: "11 Rue de la Fontaine au Roi, 75011 Paris", rating: 4.4, priceRange: "€€", latitude: 48.8661, longitude: 2.3701, website: null }, // Updated address and rating
-            { name: "Le Syndicat", category: "Bars & Nightlife", description: "Hidden speakeasy-style bar focused on French spirits near Gare du Nord.", type: "Cocktail Bar (Speakeasy)", address: "51 Rue du Faubourg Saint-Denis, 75010 Paris", rating: 4.5, priceRange: "€€€", latitude: 48.8733, longitude: 2.3547, website: "https://syndicatcocktailclub.com/" }, // Updated rating
-            { name: "Gravity Bar", category: "Bars & Nightlife", description: "Modern cocktail bar with stunning design and small plates in Canal Saint-Martin.", type: "Cocktail Bar", address: "44 Rue des Vinaigriers, 75010 Paris", rating: 4.5, priceRange: "€€€", latitude: 48.8711, longitude: 2.3625, website: "https://www.gravitybarparis.com/" }, // Updated rating
-            { name: "Le Baron Rouge", category: "Bars & Nightlife", description: "Bustling wine bar near Marché d’Aligre with wines by the barrel and oysters.", type: "Wine Bar", address: "1 Rue Théophile Roussel, 75012 Paris", rating: 4.6, priceRange: "€", latitude: 48.8490, longitude: 2.3810, website: null }, // Updated rating
-            { name: "Trouble", category: "Bars & Nightlife", description: "Natural wine bar in Pigalle offering great wines and cozy ambiance.", type: "Natural Wine Bar", address: "29 Rue Notre Dame de Lorette, 75009 Paris", rating: 4.6, priceRange: "€€", latitude: 48.8782, longitude: 2.3396, website: null }, // Updated address and rating
-            { name: "Canailles", category: "Bars & Nightlife", description: "Canal-side natural wine bar with excellent plates for sharing.", type: "Natural Wine Bar", address: "12 Rue de la Fontaine au Roi, 75011 Paris", rating: 4.5, priceRange: "€€", latitude: 48.8660, longitude: 2.3700, website: null }, // Updated rating
+            { name: "Classique", category: "Bars & Nightlife", description: "Café by day, cocktail lounge by night with a lovely terrace in the 9th.", type: "Cocktail Bar/Café", address: "1 bis Rue Lallier, 75009 Paris", rating: 4.5, priceRange: "€€", latitude: 48.8817, longitude: 2.3415, website: "https://classique-paris.com/" },
+            { name: "Combat", category: "Bars & Nightlife", description: "Craft cocktail bar with a female-led team in Belleville.", type: "Cocktail Bar", address: "63 Rue de Belleville, 75019 Paris", rating: 4.6, priceRange: "€€", latitude: 48.8737, longitude: 2.3825, website: "https://combatbelleville.com/" },
+            { name: "Castor Club", category: "Bars & Nightlife", description: "Cozy “log cabin” cocktail bar in Saint-Germain-des-Prés.", type: "Cocktail Bar", address: "14 Rue Hautefeuille, 75006 Paris", rating: 4.5, priceRange: "€€", latitude: 48.8526, longitude: 2.3413, website: null },
+            { name: "Brigitte", category: "Bars & Nightlife", description: "Laid-back cocktail spot in the Oberkampf area with consistently good drinks.", type: "Cocktail Bar", address: "11 Rue de la Fontaine au Roi, 75011 Paris", rating: 4.4, priceRange: "€€", latitude: 48.8661, longitude: 2.3701, website: null },
+            { name: "Le Syndicat", category: "Bars & Nightlife", description: "Hidden speakeasy-style bar focused on French spirits near Gare du Nord.", type: "Cocktail Bar (Speakeasy)", address: "51 Rue du Faubourg Saint-Denis, 75010 Paris", rating: 4.5, priceRange: "€€€", latitude: 48.8733, longitude: 2.3547, website: "https://syndicatcocktailclub.com/" },
+            { name: "Gravity Bar", category: "Bars & Nightlife", description: "Modern cocktail bar with stunning design and small plates in Canal Saint-Martin.", type: "Cocktail Bar", address: "44 Rue des Vinaigriers, 75010 Paris", rating: 4.5, priceRange: "€€€", latitude: 48.8711, longitude: 2.3625, website: "https://www.gravitybarparis.com/" },
+            { name: "Le Baron Rouge", category: "Bars & Nightlife", description: "Bustling wine bar near Marché d’Aligre with wines by the barrel and oysters.", type: "Wine Bar", address: "1 Rue Théophile Roussel, 75012 Paris", rating: 4.6, priceRange: "€", latitude: 48.8490, longitude: 2.3810, website: null },
+            { name: "Trouble", category: "Bars & Nightlife", description: "Natural wine bar in Pigalle offering great wines and cozy ambiance.", type: "Natural Wine Bar", address: "29 Rue Notre Dame de Lorette, 75009 Paris", rating: 4.6, priceRange: "€€", latitude: 48.8782, longitude: 2.3396, website: null },
+            { name: "Canailles", category: "Bars & Nightlife", description: "Canal-side natural wine bar with excellent plates for sharing.", type: "Natural Wine Bar", address: "12 Rue de la Fontaine au Roi, 75011 Paris", rating: 4.5, priceRange: "€€", latitude: 48.8660, longitude: 2.3700, website: null },
 
             // --- Pâtisseries & Bakeries ---
-            { name: "Brigat", category: "Pâtisseries & Bakeries", description: "Elegant pâtisserie in the 17th known for creative, visually striking desserts.", type: "Pâtisserie", address: "6 Rue du Dôme, 75016 Paris", rating: 4.8, priceRange: "€€€", latitude: 48.8691, longitude: 2.2889, website: "https://brigat.fr/" }, // Updated address and rating
-            { name: "Babka Zana", category: "Pâtisseries & Bakeries", description: "Famous for their pistachio and chocolate babka in the 9th.", type: "Bakery/Pâtisserie (Babka)", address: "65 Rue Condorcet, 75009 Paris", rating: 4.7, priceRange: "€€", latitude: 48.8800, longitude: 2.3425, website: "https://www.babkazana.com/" }, // Updated rating
-            { name: "Mamiche", category: "Pâtisseries & Bakeries", description: "Beloved bakery straddling the 9th & 10th, with queues for sourdough and viennoiseries.", type: "Bakery (Sourdough)", address: "45 Rue Condorcet, 75009 Paris", rating: 4.6, priceRange: "€", latitude: 48.8796, longitude: 2.3432, website: "https://www.mamiche.fr/" }, // Updated rating and price
-            { name: "Boneshaker", category: "Pâtisseries & Bakeries", description: "American-style artisanal doughnut shop in the 2nd Arrondissement.", type: "Doughnut Shop", address: "77 Rue d'Aboukir, 75002 Paris", rating: 4.6, priceRange: "€€", latitude: 48.8676, longitude: 2.3466, website: "https://www.boneshakerparis.com/" }, // Updated address and rating
-            { name: "Plaq", category: "Pâtisseries & Bakeries", description: "Minimalist bean-to-bar chocolatier in the 2nd with premium single-origin chocolate.", type: "Chocolatier (Bean-to-Bar)", address: "4 Rue du Nil, 75002 Paris", rating: 4.8, priceRange: "€€€", latitude: 48.8674, longitude: 2.3464, website: "https://plaqchocolat.fr/" }, // Updated rating
-            { name: "JJ Hings", category: "Pâtisseries & Bakeries", description: "Creative ice cream shop near Canal Saint‑Martin offering gourmet flavors and sourdough cones.", type: "Ice Cream Shop", address: "4 Rue de la Grange aux Belles, 75010 Paris", rating: 4.7, priceRange: "€€", latitude: 48.8725, longitude: 2.3645, website: "https://www.jjhings.com/" } // Updated address and rating
+            { name: "Brigat", category: "Pâtisseries & Bakeries", description: "Elegant pâtisserie in the 17th known for creative, visually striking desserts.", type: "Pâtisserie", address: "6 Rue du Dôme, 75016 Paris", rating: 4.8, priceRange: "€€€", latitude: 48.8691, longitude: 2.2889, website: "https://brigat.fr/" },
+            { name: "Babka Zana", category: "Pâtisseries & Bakeries", description: "Famous for their pistachio and chocolate babka in the 9th.", type: "Bakery/Pâtisserie (Babka)", address: "65 Rue Condorcet, 75009 Paris", rating: 4.7, priceRange: "€€", latitude: 48.8800, longitude: 2.3425, website: "https://www.babkazana.com/" },
+            { name: "Mamiche", category: "Pâtisseries & Bakeries", description: "Beloved bakery straddling the 9th & 10th, with queues for sourdough and viennoiseries.", type: "Bakery (Sourdough)", address: "45 Rue Condorcet, 75009 Paris", rating: 4.6, priceRange: "€", latitude: 48.8796, longitude: 2.3432, website: "https://www.mamiche.fr/" },
+            { name: "Boneshaker", category: "Pâtisseries & Bakeries", description: "American-style artisanal doughnut shop in the 2nd Arrondissement.", type: "Doughnut Shop", address: "77 Rue d'Aboukir, 75002 Paris", rating: 4.6, priceRange: "€€", latitude: 48.8676, longitude: 2.3466, website: "https://www.boneshakerparis.com/" },
+            { name: "Plaq", category: "Pâtisseries & Bakeries", description: "Minimalist bean-to-bar chocolatier in the 2nd with premium single-origin chocolate.", type: "Chocolatier (Bean-to-Bar)", address: "4 Rue du Nil, 75002 Paris", rating: 4.8, priceRange: "€€€", latitude: 48.8674, longitude: 2.3464, website: "https://plaqchocolat.fr/" },
+            { name: "JJ Hings", category: "Pâtisseries & Bakeries", description: "Creative ice cream shop near Canal Saint‑Martin offering gourmet flavors and sourdough cones.", type: "Ice Cream Shop", address: "4 Rue de la Grange aux Belles, 75010 Paris", rating: 4.7, priceRange: "€€", latitude: 48.8725, longitude: 2.3645, website: "https://www.jjhings.com/" }
         ];
 
-        // --- Global Variables ---
+        // --- Global Variables & Constants ---
         let map;
-        let markers = []; // To keep track of markers for filtering
+        let markers = [];
+        const THEME_KEY = 'paris_restaurant_theme'; // localStorage key
+        const moonIcon = '<i class="fa-solid fa-moon"></i>';
+        const sunIcon = '<i class="fa-solid fa-sun"></i>';
 
         // --- Custom Leaflet Icons ---
         const blueIcon = new L.Icon({
             iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
             shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
+            iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
         });
-
         const redIcon = new L.Icon({
             iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
             shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
+            iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
         });
-
 
         // --- Map Initialization ---
         function initMap() {
-            // Initialize the map centered on Paris
-            map = L.map('map').setView([48.8566, 2.3522], 12); // Paris center, zoom level 12
-
-            // Add OpenStreetMap tile layer
+            map = L.map('map').setView([48.8566, 2.3522], 12);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
-
-             // Add initial markers for all restaurants
-            addMarkers(restaurants);
+            addMarkers(restaurants); // Add initial markers
         }
 
         // --- Map Markers ---
          function addMarkers(restaurantsToDisplay) {
-            // Clear existing markers
             markers.forEach(marker => map.removeLayer(marker));
             markers = [];
-
-            // Add new markers
             restaurantsToDisplay.forEach(restaurant => {
                 if (restaurant.latitude && restaurant.longitude) {
-                    // *** Choose icon based on category ***
                     const chosenIcon = restaurant.category === "Bars & Nightlife" ? redIcon : blueIcon;
-
-                    const marker = L.marker([restaurant.latitude, restaurant.longitude], { icon: chosenIcon }).addTo(map); // *** Use chosen icon ***
-
-                    // Create popup content
+                    const marker = L.marker([restaurant.latitude, restaurant.longitude], { icon: chosenIcon }).addTo(map);
                     const popupContent = `
                         <div class="font-sans">
                             <strong class="text-base block mb-1">${restaurant.name}</strong>
-                            <span class="text-sm text-gray-600 block mb-1">${restaurant.type || 'N/A'} - ${restaurant.priceRange || 'N/A'}</span>
-                            <span class="text-sm text-gray-500 block">${restaurant.address || 'N/A'}</span>
+                            <span class="text-sm block mb-1">${restaurant.type || 'N/A'} - ${restaurant.priceRange || 'N/A'}</span>
+                            <span class="text-sm block">${restaurant.address || 'N/A'}</span>
                             ${generateGoogleMapsLink(restaurant.name, restaurant.address) ?
-                                `<a href="${generateGoogleMapsLink(restaurant.name, restaurant.address)}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 text-sm mt-1 inline-block">View on Google Maps</a>`
+                                `<a href="${generateGoogleMapsLink(restaurant.name, restaurant.address)}" target="_blank" rel="noopener noreferrer" class="text-sm mt-1 inline-block">View on Google Maps</a>`
                                 : ''
                             }
-                        </div>
-                    `;
+                        </div>`;
                     marker.bindPopup(popupContent);
-                    markers.push(marker); // Store marker reference
+                    markers.push(marker);
                 }
             });
-
-            // Adjust map view if markers were added and map exists
+            // Adjust map view
             if (markers.length > 0 && map) {
                  const group = new L.featureGroup(markers);
-                 // Check if map has bounds before fitting
                  try {
-                    // Only fit bounds if it's not the initial full load, or if few markers exist
-                    // This prevents zooming out too far when all markers are shown initially.
                     if (restaurantsToDisplay.length < restaurants.length || markers.length < 10) {
-                         map.fitBounds(group.getBounds().pad(0.1)); // Fit bounds with padding
-                    } else if (map.getZoom() < 12) { // Ensure initial zoom isn't too far out
+                         map.fitBounds(group.getBounds().pad(0.1));
+                    } else if (map.getZoom() < 12) {
                         map.setView([48.8566, 2.3522], 12);
                     }
                  } catch (e) {
-                    console.warn("Could not fit map bounds, likely no valid markers.", e);
-                    // Fallback: Set default view if fitBounds fails
+                    console.warn("Could not fit map bounds.", e);
                     map.setView([48.8566, 2.3522], 12);
                  }
             } else if (map) {
-                 // If no markers, reset to default view
                  map.setView([48.8566, 2.3522], 12);
             }
         }
 
-
         // --- Restaurant Display ---
         function displayRestaurants(filteredRestaurants) {
             const container = document.getElementById("restaurant-sections-container");
-            container.innerHTML = ""; // Clear previous content
-
+            container.innerHTML = "";
             if (filteredRestaurants.length === 0) {
-                container.innerHTML = '<p class="text-center text-gray-500 mt-6">No restaurants match your criteria.</p>';
-                addMarkers([]); // Clear map markers
+                container.innerHTML = '<p class="text-center mt-6">No restaurants match your criteria.</p>';
+                addMarkers([]);
                 return;
             }
-
-            // Group restaurants by category
             const groupedByCategory = filteredRestaurants.reduce((acc, restaurant) => {
-                const category = restaurant.category || "Uncategorized"; // Handle missing category
-                if (!acc[category]) {
-                    acc[category] = [];
-                }
+                const category = restaurant.category || "Uncategorized";
+                if (!acc[category]) acc[category] = [];
                 acc[category].push(restaurant);
                 return acc;
             }, {});
-
-            // Get sorted category names
             const sortedCategories = Object.keys(groupedByCategory).sort();
-
-            // Create sections for each category
             sortedCategories.forEach(category => {
                 const section = document.createElement("section");
-                section.classList.add("restaurant-category-section");
-                section.setAttribute('data-category', category); // Add data attribute for potential future use
-
+                section.className = "restaurant-category-section";
+                section.dataset.category = category;
                 const title = document.createElement("h2");
-                title.classList.add("restaurant-category-title");
+                title.className = "restaurant-category-title";
                 title.textContent = category;
                 section.appendChild(title);
-
                 const grid = document.createElement("div");
-                grid.classList.add("restaurant-grid"); // Use the grid class
-
-                // Create cards for restaurants in this category
+                grid.className = "restaurant-grid";
                 groupedByCategory[category].forEach(restaurant => {
-                    const restaurantCard = createRestaurantCard(restaurant);
-                    grid.appendChild(restaurantCard);
+                    grid.appendChild(createRestaurantCard(restaurant));
                 });
-
                 section.appendChild(grid);
                 container.appendChild(section);
             });
-
-             // Update map markers with the filtered list
             addMarkers(filteredRestaurants);
         }
 
         // --- Create Single Restaurant Card ---
         function createRestaurantCard(restaurant) {
             const card = document.createElement("div");
-            card.classList.add("restaurant-item");
-
-            // Generate rating stars
+            card.className = "restaurant-item";
             const ratingStars = generateRatingStars(restaurant.rating);
-
-            // Generate Google Maps link
             const mapLink = generateGoogleMapsLink(restaurant.name, restaurant.address);
-
             card.innerHTML = `
                 <div> <h3 class="restaurant-name">${restaurant.name}</h3>
                     <p class="restaurant-description">${restaurant.description || 'No description available.'}</p>
-                    <div class="restaurant-details">
-                        <strong>Type:</strong> ${restaurant.type || 'N/A'}
-                    </div>
-                    <div class="restaurant-details">
-                        <strong>Price:</strong> ${restaurant.priceRange || 'N/A'}
-                    </div>
-                    <div class="restaurant-details">
-                        <strong>Rating:</strong>
-                        <span class="rating-stars">${ratingStars}</span>
-                        <span class="ml-1">(${restaurant.rating ? restaurant.rating.toFixed(1) : 'N/A'})</span>
-                    </div>
-                    <div class="restaurant-details">
-                        <strong>Address:</strong> ${restaurant.address || 'N/A'}
-                    </div>
-                    ${restaurant.website ? `
-                        <div class="restaurant-details">
-                           <strong>Website:</strong> <a href="${restaurant.website}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 hover:underline">${getDomainName(restaurant.website)}</a>
-                        </div>
-                    ` : ''}
+                    <div class="restaurant-details"><strong>Type:</strong> ${restaurant.type || 'N/A'}</div>
+                    <div class="restaurant-details"><strong>Price:</strong> ${restaurant.priceRange || 'N/A'}</div>
+                    <div class="restaurant-details"><strong>Rating:</strong> <span class="rating-stars">${ratingStars}</span> <span class="ml-1">(${restaurant.rating ? restaurant.rating.toFixed(1) : 'N/A'})</span></div>
+                    <div class="restaurant-details"><strong>Address:</strong> ${restaurant.address || 'N/A'}</div>
+                    ${restaurant.website ? `<div class="restaurant-details"><strong>Website:</strong> <a href="${restaurant.website}" target="_blank" rel="noopener noreferrer" class="hover:underline">${getDomainName(restaurant.website)}</a></div>` : ''}
                 </div>
-                <div> ${mapLink ? `
-                        <a href="${mapLink}" target="_blank" rel="noopener noreferrer" class="map-link">
-                            <i class="lucide"></i> View on Map
-                        </a>
-                    ` : ''}
-                </div>
-            `;
+                <div> ${mapLink ? `<a href="${mapLink}" target="_blank" rel="noopener noreferrer" class="map-link"><i class="fa-solid fa-map-pin mr-1"></i> View on Map</a>` : ''}</div>`;
             return card;
         }
 
         // --- Helper Functions ---
-
-        // Generate Google Maps search link
         function generateGoogleMapsLink(name, address) {
             if (!name || !address) return null;
-            // Use https for Google Maps links
             const query = encodeURIComponent(`${name}, ${address}`);
-            // Correct Google Maps search URL structure
             return `https://www.google.com/maps/search/?api=1&query=${query}`;
         }
-
-         // Generate star icons based on rating
         function generateRatingStars(rating) {
-            if (typeof rating !== 'number' || rating < 0 || isNaN(rating)) return 'N/A'; // Added isNaN check
-            const fullStar = '<i class="lucide"></i>'; // star icon filled
-            const halfStar = '<i class="lucide"></i>'; // star-half icon
-            const emptyStar = '<i class="lucide"></i>'; // star icon empty
+            if (typeof rating !== 'number' || rating < 0 || isNaN(rating)) return 'N/A';
+            const fullStar = '<i class="fa-solid fa-star"></i>';
+            const halfStar = '<i class="fa-solid fa-star-half-stroke"></i>';
+            const emptyStar = '<i class="fa-regular fa-star"></i>';
             const maxStars = 5;
             let starsHtml = '';
-            const roundedRating = Math.round(rating * 2) / 2; // Round to nearest 0.5
-
+            const roundedRating = Math.round(rating * 2) / 2;
             for (let i = 1; i <= maxStars; i++) {
-                if (i <= roundedRating) {
-                    starsHtml += fullStar;
-                } else if (i - 0.5 === roundedRating) {
-                    starsHtml += halfStar;
-                } else {
-                    starsHtml += emptyStar;
-                }
+                if (i <= roundedRating) starsHtml += fullStar;
+                else if (i - 0.5 === roundedRating) starsHtml += halfStar;
+                else starsHtml += emptyStar;
             }
             return starsHtml;
         }
-
-        // Get domain name from URL
          function getDomainName(url) {
             if (!url) return '';
             try {
-                const parsedUrl = new URL(url);
-                // Remove 'www.' if present
+                let fullUrl = url;
+                if (!/^https?:\/\//i.test(url)) fullUrl = 'https://' + url;
+                const parsedUrl = new URL(fullUrl);
                 return parsedUrl.hostname.replace(/^www\./, '');
             } catch (e) {
-                // If URL is invalid, maybe it's just a domain name already
-                if (!url.includes('/') && url.includes('.')) {
-                    return url.replace(/^www\./, '');
-                }
-                console.error("Invalid URL:", url, e);
-                return url; // Return original string if parsing fails or it's not a standard URL
+                 if (!url.includes('/') && url.includes('.')) return url.replace(/^www\./, '');
+                console.error("Could not parse URL to get domain:", url, e);
+                return url;
             }
         }
-
-
-        // Show a temporary message
         function showMessage(message, duration = 3000) {
             const messageBox = document.getElementById('message-box');
-            if (!messageBox) return; // Exit if message box doesn't exist
+            if (!messageBox) return;
             messageBox.textContent = message;
             messageBox.classList.add('show');
-
-            // Hide the message after the duration
-            setTimeout(() => {
-                messageBox.classList.remove('show');
-            }, duration);
+            setTimeout(() => messageBox.classList.remove('show'), duration);
         }
 
         // --- Filtering and Sorting Logic ---
@@ -570,124 +498,124 @@
             const selectedCategory = document.getElementById('filter-category').value;
             const selectedType = document.getElementById('filter-type').value;
             const sortValue = document.getElementById('sort-options').value;
-
-            // 1. Filter
             let filtered = restaurants.filter(r => {
-                // Ensure description exists before calling toLowerCase
                 const description = r.description || "";
-                // Match search term in name or description
                 const searchMatch = r.name.toLowerCase().includes(searchTerm) || description.toLowerCase().includes(searchTerm);
-                // Match category filter
                 const categoryMatch = !selectedCategory || r.category === selectedCategory;
-                // Match type filter
                 const typeMatch = !selectedType || r.type === selectedType;
-
                 return searchMatch && categoryMatch && typeMatch;
             });
-
-            // 2. Sort
             switch (sortValue) {
-                case 'name_asc':
-                    filtered.sort((a, b) => a.name.localeCompare(b.name));
-                    break;
-                case 'name_desc':
-                    filtered.sort((a, b) => b.name.localeCompare(a.name));
-                    break;
-                case 'rating_asc':
-                    // Handle null/undefined/NaN ratings - sort them to the bottom (-1)
-                    filtered.sort((a, b) => (a.rating ?? -1) - (b.rating ?? -1));
-                    break;
-                case 'rating_desc':
-                     // Handle null/undefined/NaN ratings - sort them to the bottom (-1)
-                    filtered.sort((a, b) => (b.rating ?? -1) - (a.rating ?? -1));
-                    break;
-                case 'price_asc':
-                    // Sort by length of priceRange string (€ < €€ < €€€), treat null/undefined as 0 length
-                    filtered.sort((a, b) => (a.priceRange?.length ?? 0) - (b.priceRange?.length ?? 0));
-                    break;
-                case 'price_desc':
-                     // Sort by length of priceRange string (€€€ > €€ > €), treat null/undefined as 0 length
-                    filtered.sort((a, b) => (b.priceRange?.length ?? 0) - (a.priceRange?.length ?? 0));
-                    break;
-                case 'default':
-                default:
-                    // Keep original order after filtering (or implement category-based default sort if needed)
-                    break;
+                case 'name_asc': filtered.sort((a, b) => a.name.localeCompare(b.name)); break;
+                case 'name_desc': filtered.sort((a, b) => b.name.localeCompare(a.name)); break;
+                case 'rating_asc': filtered.sort((a, b) => (a.rating ?? -1) - (b.rating ?? -1)); break;
+                case 'rating_desc': filtered.sort((a, b) => (b.rating ?? -1) - (a.rating ?? -1)); break;
+                case 'price_asc': filtered.sort((a, b) => (a.priceRange?.length ?? 0) - (b.priceRange?.length ?? 0)); break;
+                case 'price_desc': filtered.sort((a, b) => (b.priceRange?.length ?? 0) - (a.priceRange?.length ?? 0)); break;
             }
-
-            // 3. Display
             displayRestaurants(filtered);
         }
-
 
         // --- Populate Filter Dropdowns ---
         function populateFilters() {
             const categoryFilter = document.getElementById('filter-category');
             const typeFilter = document.getElementById('filter-type');
-
-            // Get unique categories and types, handling potential null/undefined values and sorting
             const categories = [...new Set(restaurants.map(r => r.category).filter(Boolean))].sort();
             const types = [...new Set(restaurants.map(r => r.type).filter(Boolean))].sort();
-
-            // Populate Category Filter
             categories.forEach(category => {
                 const option = document.createElement('option');
-                option.value = category;
-                option.textContent = category;
+                option.value = category; option.textContent = category;
                 categoryFilter.appendChild(option);
             });
-
-            // Populate Type Filter
             types.forEach(type => {
                 const option = document.createElement('option');
-                option.value = type;
-                option.textContent = type;
+                option.value = type; option.textContent = type;
                 typeFilter.appendChild(option);
             });
         }
 
-        // --- Event Listeners ---
+        // --- Night Mode Toggle Logic ---
+        function setupNightModeToggle() {
+            const toggleButton = document.getElementById('night-mode-toggle');
+            const htmlEl = document.documentElement; // Target the <html> element
+
+            function setMode(isDark) {
+                if (!toggleButton) return; // Safety check
+
+                if (isDark) {
+                    htmlEl.classList.add('dark-mode'); // Add class to <html>
+                    toggleButton.innerHTML = sunIcon + ' Light Mode';
+                    localStorage.setItem(THEME_KEY, 'dark');
+                } else {
+                    htmlEl.classList.remove('dark-mode'); // Remove class from <html>
+                    toggleButton.innerHTML = moonIcon + ' Dark Mode';
+                    localStorage.setItem(THEME_KEY, 'light');
+                }
+            }
+
+            toggleButton.addEventListener('click', () => {
+                setMode(!htmlEl.classList.contains('dark-mode')); // Check <html> for class
+            });
+
+            // Apply saved theme or system preference on load
+            const savedTheme = localStorage.getItem(THEME_KEY);
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                 setMode(true);
+            } else {
+                 setMode(false); // Default to light
+            }
+
+            // Optional: Listen for system preference changes
+             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+                // Only change if no theme is explicitly saved by the user
+                if (!localStorage.getItem(THEME_KEY)) {
+                     setMode(event.matches);
+                }
+            });
+        }
+
+        // --- Event Listeners Setup ---
         function setupEventListeners() {
             const searchInput = document.getElementById('search-input');
             const categoryFilter = document.getElementById('filter-category');
             const typeFilter = document.getElementById('filter-type');
             const sortOptions = document.getElementById('sort-options');
-
-            // Debounce function to limit filter updates on rapid input
             let debounceTimer;
             function debouncedFilter() {
                 clearTimeout(debounceTimer);
-                debounceTimer = setTimeout(filterAndSortRestaurants, 250); // Adjust delay (ms) as needed
+                debounceTimer = setTimeout(filterAndSortRestaurants, 250);
             }
-
-            // Filter/Sort on change/input
-            searchInput.addEventListener('input', debouncedFilter); // Use debounced version for search
+            searchInput.addEventListener('input', debouncedFilter);
             categoryFilter.addEventListener('change', filterAndSortRestaurants);
             typeFilter.addEventListener('change', filterAndSortRestaurants);
             sortOptions.addEventListener('change', filterAndSortRestaurants);
-        }
 
+            // Setup night mode listener
+            setupNightModeToggle();
+        }
 
         // --- Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
-            // Make sure Leaflet (L) is loaded before proceeding
             if (typeof L === 'undefined') {
                 console.error("Leaflet library not loaded!");
                 showMessage("Error loading map component. Please refresh.", 5000);
                 return;
             }
-
             try {
                 initMap();
                 populateFilters();
-                setupEventListeners();
-                displayRestaurants(restaurants); // Initial display of all restaurants
+                setupEventListeners(); // This now includes night mode setup
+                // Initial display is handled by setupNightModeToggle applying the theme
+                // which then triggers styles, and initMap/populateFilters run regardless.
+                // We still need an initial restaurant display call after filters are populated.
+                displayRestaurants(restaurants);
             } catch (error) {
                 console.error("Error initializing the page:", error);
                 showMessage("Error loading restaurant data or map. Please try refreshing.", 5000);
             }
         });
-
     </script>
 </body>
 </html>
