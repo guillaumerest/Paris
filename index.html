@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guillaume's Paris Restaurant Guide</title>
+    <title>Paris Restaurant Guide</title> {/* Updated Title */}
     <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -125,9 +125,21 @@
 
         /* Category Section Title */
         .restaurant-category-title {
+            font-size: 2rem; /* Increased font size (e.g., 32px) */
+            font-weight: 600;
             color: var(--text-color-heading);
             border-bottom-color: var(--border-color);
-            transition: color 0.3s ease, border-color 0.3s ease; /* Add transition */
+            transition: color 0.3s ease, border-color 0.3s ease;
+            display: flex; /* Use flexbox for icon alignment */
+            align-items: center; /* Vertically center icon and text */
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom-width: 2px;
+        }
+        .category-icon {
+            font-size: 1.8rem; /* Adjust icon size if needed */
+            margin-right: 0.75rem; /* Space between icon and text */
+            line-height: 1; /* Prevent extra line height */
         }
 
         /* Restaurant Card */
@@ -135,13 +147,16 @@
             background-color: var(--card-bg); border-color: var(--border-color);
             box-shadow: 0 4px 8px var(--shadow-color-light);
             transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            border-radius: 12px; padding: 1.5rem; display: flex;
+            flex-direction: column; justify-content: space-between; height: 100%;
+            border-width: 1px;
         }
         .restaurant-item:hover {
             box-shadow: 0 6px 12px var(--shadow-color-hover-light); transform: translateY(-4px);
         }
-        .restaurant-name { color: var(--text-color-heading); }
-        .restaurant-description { color: var(--text-color-secondary); }
-        .restaurant-details { color: var(--text-color-muted); }
+        .restaurant-name { color: var(--text-color-heading); font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem; }
+        .restaurant-description { color: var(--text-color-secondary); font-size: 0.95rem; margin-bottom: 1rem; flex-grow: 1; }
+        .restaurant-details { color: var(--text-color-muted); font-size: 0.9rem; margin-bottom: 0.5rem; }
         .restaurant-details strong { color: var(--text-color-secondary); font-weight: 500; }
         /* Add transitions for text colors inside card */
         html.dark-mode .restaurant-item .restaurant-name,
@@ -231,13 +246,16 @@
         }
     </script>
 </head>
-<body> <div class="container mx-auto p-4 md:p-8">
+<body>
+    <div class="container mx-auto p-4 md:p-8">
         <header class="relative text-center mb-10 pt-4">
-            <h1 class="text-4xl font-bold mb-2">Guillaume's Paris Restaurant Guide</h1>
-            <p class="text-lg">Your curated list of Parisian culinary delights</p>
+            {/* Updated Title and Subtitle */}
+            <h1 class="text-4xl font-bold mb-2">Paris Restaurant Guide</h1>
+            <p class="text-lg">Guillaume 2025</p>
             <div class="absolute top-0 right-0 mt-0 mr-0">
                  <button id="night-mode-toggle" aria-label="Toggle dark mode">
-                     </button>
+                     {/* Icon/text set by JS */}
+                 </button>
             </div>
         </header>
 
@@ -330,9 +348,20 @@
         // --- Global Variables & Constants ---
         let map;
         let markers = [];
-        const THEME_KEY = 'paris_restaurant_theme'; // localStorage key
+        const THEME_KEY = 'paris_restaurant_theme';
         const moonIcon = '<i class="fa-solid fa-moon"></i>';
         const sunIcon = '<i class="fa-solid fa-sun"></i>';
+
+        // --- Emojis for Categories ---
+        const categoryIcons = {
+            "Traditional & Classic French Dining": "🇫🇷",
+            "Modern & Innovative French Dining": "✨",
+            "World Cuisine & Fusion": "🌍",
+            "Rooftops, Terraces & Festive Dining": "🌇",
+            "Bars & Nightlife": "🍸",
+            "Pâtisseries & Bakeries": "🥐",
+            "Uncategorized": "❓" // Fallback icon
+        };
 
         // --- Custom Leaflet Icons ---
         const blueIcon = new L.Icon({
@@ -353,7 +382,7 @@
                 maxZoom: 19,
                 attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
-            addMarkers(restaurants); // Add initial markers
+            addMarkers(restaurants);
         }
 
         // --- Map Markers ---
@@ -416,10 +445,17 @@
                 const section = document.createElement("section");
                 section.className = "restaurant-category-section";
                 section.dataset.category = category;
+
+                // Create title with icon
                 const title = document.createElement("h2");
                 title.className = "restaurant-category-title";
-                title.textContent = category;
+                const icon = categoryIcons[category] || categoryIcons["Uncategorized"]; // Get icon or fallback
+                title.innerHTML = `
+                    <span class="category-icon">${icon}</span>
+                    <span class="category-text">${category}</span>
+                `;
                 section.appendChild(title);
+
                 const grid = document.createElement("div");
                 grid.className = "restaurant-grid";
                 groupedByCategory[category].forEach(restaurant => {
@@ -537,39 +573,36 @@
         // --- Night Mode Toggle Logic ---
         function setupNightModeToggle() {
             const toggleButton = document.getElementById('night-mode-toggle');
-            const htmlEl = document.documentElement; // Target the <html> element
+            const htmlEl = document.documentElement;
 
             function setMode(isDark) {
-                if (!toggleButton) return; // Safety check
-
+                if (!toggleButton) return;
                 if (isDark) {
-                    htmlEl.classList.add('dark-mode'); // Add class to <html>
+                    htmlEl.classList.add('dark-mode');
                     toggleButton.innerHTML = sunIcon + ' Light Mode';
                     localStorage.setItem(THEME_KEY, 'dark');
                 } else {
-                    htmlEl.classList.remove('dark-mode'); // Remove class from <html>
+                    htmlEl.classList.remove('dark-mode');
                     toggleButton.innerHTML = moonIcon + ' Dark Mode';
                     localStorage.setItem(THEME_KEY, 'light');
                 }
             }
 
             toggleButton.addEventListener('click', () => {
-                setMode(!htmlEl.classList.contains('dark-mode')); // Check <html> for class
+                setMode(!htmlEl.classList.contains('dark-mode'));
             });
 
             // Apply saved theme or system preference on load
             const savedTheme = localStorage.getItem(THEME_KEY);
             const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-
             if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
                  setMode(true);
             } else {
-                 setMode(false); // Default to light
+                 setMode(false);
             }
 
             // Optional: Listen for system preference changes
              window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
-                // Only change if no theme is explicitly saved by the user
                 if (!localStorage.getItem(THEME_KEY)) {
                      setMode(event.matches);
                 }
@@ -591,8 +624,6 @@
             categoryFilter.addEventListener('change', filterAndSortRestaurants);
             typeFilter.addEventListener('change', filterAndSortRestaurants);
             sortOptions.addEventListener('change', filterAndSortRestaurants);
-
-            // Setup night mode listener
             setupNightModeToggle();
         }
 
@@ -606,10 +637,7 @@
             try {
                 initMap();
                 populateFilters();
-                setupEventListeners(); // This now includes night mode setup
-                // Initial display is handled by setupNightModeToggle applying the theme
-                // which then triggers styles, and initMap/populateFilters run regardless.
-                // We still need an initial restaurant display call after filters are populated.
+                setupEventListeners();
                 displayRestaurants(restaurants);
             } catch (error) {
                 console.error("Error initializing the page:", error);
@@ -619,3 +647,4 @@
     </script>
 </body>
 </html>
+
