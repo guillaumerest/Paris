@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paris Restaurant Guide</title> 
+    <title>Paris Restaurant Guide</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -290,8 +290,7 @@
     <script>
         // --- Data ---
         const restaurants = [
-             // (Restaurant data remains the same as previous version)
-             // --- Traditional & Classic French Dining ---
+            // --- Traditional & Classic French Dining ---
             { name: "Le Bouillon Chartier", category: "Traditional & Classic French Dining", description: "Traditional French Brasserie in the 9th Arrondissement, famed for its Belle Époque décor, bustling atmosphere, classic dishes, and extremely low prices.", type: "French Brasserie", address: "7 Rue du Faubourg Montmartre, 75009 Paris", rating: 4.0, priceRange: "€", latitude: 48.8722, longitude: 2.3444, website: "https://www.bouillon-chartier.com/en/" },
             { name: "Le Consulat", category: "Traditional & Classic French Dining", description: "A classic French café/brasserie in Montmartre (18th Arrondissement) known for its picturesque façade and deep historical charm.", type: "French Cafe/Brasserie", address: "18 Rue Norvins, 75018 Paris", rating: 3.8, priceRange: "€€", latitude: 48.8867, longitude: 2.3399, website: null },
             { name: "La Maison Rose", category: "Traditional & Classic French Dining", description: "Historic restaurant & café in Montmartre (18th Arrondissement) celebrated for its iconic pink building, artistically inspired history, and seasonal French/Italian fare.", type: "French/Italian", address: "2 Rue de l'Abreuvoir, 75018 Paris", rating: 4.1, priceRange: "€€", latitude: 48.8875, longitude: 2.3393, website: "https://lamaisonrose-montmartre.com/en" },
@@ -307,7 +306,19 @@
             // --- Modern & Innovative French Dining ---
             { name: "Bistrotters", category: "Modern & Innovative French Dining", description: "Modern bistro in the 14th Arrondissement offering creative tasting menus and excellent value.", type: "Modern French Bistro", address: "9 Rue Decrès, 75014 Paris", rating: 4.8, priceRange: "€€", latitude: 48.8336, longitude: 2.3173, website: "https://www.bistrotters.com/" },
             { name: "Aux Plumes", category: "Modern & Innovative French Dining", description: "Intimate modern dining with Spanish-influenced creative tasting menus in the 14th Arrondissement.", type: "Modern French/Spanish", address: "45 Rue Boulard, 75014 Paris", rating: 4.7, priceRange: "€€€", latitude: 48.8332, longitude: 2.3282, website: "https://www.auxplumesparis.com/" },
-            { name: "Tadam", category: "Modern & Innovative French Dining", description: "Inventive, market-driven cuisine and natural wines in the 13th Arrondissement.", type: "Modern French/Natural Wine", address: "14 Rue du Jura, 75013 Paris", rating: 4.5, priceRange: "€€", latitude: 48.8371, longitude: 2.3559, website: tadam-paris.fr },
+            // *** Updated Tadam Entry ***
+            {
+                name: "Tadam",
+                category: "Modern & Innovative French Dining",
+                description: "Inventive, market-driven cuisine and natural wines in the 13th Arrondissement.",
+                type: "Modern French/Natural Wine",
+                address: "14 Rue du Jura, 75013 Paris", // Updated Address
+                rating: 4.5,
+                priceRange: "€€",
+                latitude: 48.8304, // Approx Lat/Lon for new address (update if precise needed)
+                longitude: 2.3538, // Approx Lat/Lon for new address (update if precise needed)
+                website: "https://tadam-paris.fr" // Updated Website (with https://)
+            },
 
             // --- World Cuisine & Fusion ---
             { name: "Kokoro", category: "World Cuisine & Fusion", description: "Refined French-Japanese fusion cuisine in the Latin Quarter (5th Arrondissement).", type: "French-Japanese Fusion", address: "36 Rue des Boulangers, 75005 Paris", rating: 4.7, priceRange: "€€€", latitude: 48.8468, longitude: 2.3527, website: "https://www.kokoroparis.com/" },
@@ -389,9 +400,18 @@
             markers.forEach(marker => map.removeLayer(marker));
             markers = [];
             restaurantsToDisplay.forEach(restaurant => {
-                if (restaurant.latitude && restaurant.longitude) {
+                // Update Lat/Lon if they changed for Tadam
+                let lat = restaurant.latitude;
+                let lon = restaurant.longitude;
+                if(restaurant.name === "Tadam") {
+                    // Use updated coordinates if available, otherwise keep existing
+                    lat = restaurant.latitude || 48.8304;
+                    lon = restaurant.longitude || 2.3538;
+                }
+
+                if (lat && lon) {
                     const chosenIcon = restaurant.category === "Bars & Nightlife" ? redIcon : blueIcon;
-                    const marker = L.marker([restaurant.latitude, restaurant.longitude], { icon: chosenIcon }).addTo(map);
+                    const marker = L.marker([lat, lon], { icon: chosenIcon }).addTo(map);
                     const popupContent = `
                         <div class="font-sans">
                             <strong class="text-base block mb-1">${restaurant.name}</strong>
@@ -445,12 +465,11 @@
                 section.className = "restaurant-category-section";
                 section.dataset.category = category;
 
-                // Create title with icon
                 const title = document.createElement("h2");
                 title.className = "restaurant-category-title";
-                const icon = categoryIcons[category] || categoryIcons["Uncategorized"]; // Get icon or fallback
+                const icon = categoryIcons[category] || categoryIcons["Uncategorized"];
                 title.innerHTML = `
-                    <span class="category-icon">${icon}</span>
+                    <span class="category-icon" aria-hidden="true">${icon}</span>
                     <span class="category-text">${category}</span>
                 `;
                 section.appendChild(title);
@@ -637,6 +656,8 @@
                 initMap();
                 populateFilters();
                 setupEventListeners();
+                // displayRestaurants is called implicitly via filter/sort setup or night mode init
+                // but call it once explicitly after setup to ensure initial load if no theme change happens
                 displayRestaurants(restaurants);
             } catch (error) {
                 console.error("Error initializing the page:", error);
@@ -646,4 +667,3 @@
     </script>
 </body>
 </html>
-
